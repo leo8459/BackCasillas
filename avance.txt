@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class Confirmationagbcmail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public $cliente;
+    public $subject;
+    public $body;
+
+    public function __construct($cliente, $subject, $body)
+    {
+        $this->cliente = $cliente;
+        $this->subject = $subject;
+        $this->body = $body;
+    }
+
+    public function build()
+    {
+        return $this->view('emails.registro-exitoso')
+                    ->with([
+                        'cliente' => $this->cliente,
+                        'subject' => $this->subject,
+                        'body' => $this->body,
+                    ])
+                    ->subject($this->subject);
+    }
+}
