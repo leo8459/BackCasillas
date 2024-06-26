@@ -26,7 +26,7 @@ Route::group(['prefix'=>'api'],function(){
     Route::apiResource('/alquileres','AlquilereController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/precios','PrecioController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/cajeros','CajeroController');  //editar agragar eliminar listar apiresource
-    Route::delete('/eliminar-alquiler/{alquilere}', [AlquilereController::class, 'destroy']);
+
 
 
 
@@ -46,7 +46,7 @@ Route::group(['prefix'=>'cliente'],function(){
     Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
-    Route::delete('/eliminar-alquiler/{alquilere}', [AlquilereController::class, 'destroy']);
+
 
 });
 
@@ -72,7 +72,7 @@ Route::group(['prefix'=>'cajero'],function(){
     Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
-    Route::delete('/eliminar-alquiler/{alquilere}', [AlquilereController::class, 'destroy']);
+
 
 
     Route::get('/dashboard','DashboardController@patito');//solo para logear
@@ -91,6 +91,3 @@ Route::get('/', function () {
   
 });
 
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
