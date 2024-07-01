@@ -26,9 +26,9 @@ class SendEmails extends Command
         $dias_transcurridos = Carbon::parse($alquilere->fin_fecha)->diffInDays(Carbon::now());
 
         // Verificar si la diferencia en días es mayor que 15
-        if ($dias_transcurridos < 8) {
+        if ($dias_transcurridos < 46) {
             $subject = '¡Su alquiler ha vencido!';
-            $body = 'Estimado/a ' . $cliente->nombre . ', su alquiler de la casilla número ' . $casilla->nombre . ' ha vencido el día ' . Carbon::parse($alquilere->fin_fecha)->format('d/m/Y') . '. Han pasado ' . $dias_transcurridos . ' días desde entonces. Por favor, apersonarse a la ventanilla 2 para realizar la renovación correspondiente de su casillas, Pasado los 7 dias su casilla pasara a estar disponible para un nuevo usuario, Gracias.';
+            $body = 'Estimado/a ' . $cliente->nombre . ', su alquiler de la casilla número ' . $casilla->nombre . ' ha vencido el día ' . Carbon::parse($alquilere->fin_fecha)->format('d/m/Y') . '. Han pasado ' . $dias_transcurridos . ' días desde entonces. Por favor, apersonarse a la ventanilla 2 para realizar la renovación correspondiente de su casillas, Pasado los 45 dias su casilla pasara a estar disponible para un nuevo usuario, Gracias.';
 
             // Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente, $subject, $body));
 

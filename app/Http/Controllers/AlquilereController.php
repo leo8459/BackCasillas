@@ -40,8 +40,6 @@ class AlquilereController extends Controller
     {
         $alquilere = new Alquilere();
          $alquilere->nombre = $request->nombre;
-         $alquilere->apertura = $request->apertura;
-         $alquilere->habilitacion = $request->habilitacion;
          $alquilere->precio_id = $request->precio_id;
          $alquilere->cliente_id = $request->cliente_id;
          $alquilere->casilla_id = $request->casilla_id;
@@ -86,8 +84,7 @@ class AlquilereController extends Controller
          $alquilere->categoria = $alquilere->categoria;
          $alquilere->precio = $alquilere->precio;
          $alquilere->estado_pago = $alquilere->estado_pago;
-         $alquilere->apertura = $request->apertura;
-         $alquilere->habilitacion = $request->habilitacion;
+
 
         $alquilere->url_pdf = url('web/reportes/alquileres/', $alquilere->id);
         return $alquilere;
