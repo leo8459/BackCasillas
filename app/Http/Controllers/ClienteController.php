@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
 class ClienteController extends Controller
 {
     /**
@@ -17,7 +18,6 @@ class ClienteController extends Controller
     public function index()
     {
         return Cliente::all();
-
     }
 
     /**
@@ -33,18 +33,13 @@ class ClienteController extends Controller
         $cliente->nombre = $request->nombre;
         $cliente->carnet = $request->carnet;
         $cliente->direccion = $request->direccion;
- // Verifica si la casilla de habilitación está marcada y asigna el valor correspondiente
- if ($request->has('habilitacion_casilla')) {
-    $cliente->habilitacion_casilla = 10; // Asigna el valor de 10 Bs si la casilla está marcada
-} else {
-    $cliente->habilitacion_casilla = 10; // De lo contrario, asigna 0
-}        $cliente->telefono = $request->telefono;
+        $cliente->telefono = $request->telefono;
         $cliente->email = $request->email;
 
         $cliente->password = Hash::make($request->input('password'));
-    
+
         $cliente->save();
-    
+
         return $cliente;
     }
 
@@ -57,7 +52,6 @@ class ClienteController extends Controller
     public function show(Cliente $cliente)
     {
         return $cliente;
-
     }
 
     /**
@@ -70,16 +64,14 @@ class ClienteController extends Controller
     public function update(Request $request, Cliente $cliente)
     {
         $cliente->nombre = $request->nombre;
-        $cliente->estado= $request->estado;
+        $cliente->estado = $request->estado;
         $cliente->carnet = $request->carnet;
         $cliente->direccion = $request->direccion;
-        $cliente->habilitacion_casilla = $request->habilitacion_casilla;
         $cliente->telefono = $request->telefono;
-        $cliente->email= $request->email;
-        if(isset($request->password)){
-            if(!empty($request->password)){
+        $cliente->email = $request->email;
+        if (isset($request->password)) {
+            if (!empty($request->password)) {
                 $cliente->password = Hash::make($request->password);
-
             }
         }
         $cliente->save();
@@ -104,20 +96,19 @@ class ClienteController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-    
+
         // Intenta autenticar al maestro
         if (Auth::guard('cliente')->attempt(['email' => $request->email, 'password' => $request->password])) {
             // Autenticación exitosa, recupera la información del maestro
             $cliente = Auth::guard('cliente')->user();
-            
+
             // Ahora puedes acceder a la información del maestro, por ejemplo, $maestro->nombre, $maestro->email, etc.
-    
+
             // Devuelve un mensaje de éxito junto con los datos del maestro
             return response()->json(['message' => 'Inicio de sesión correcto', 'cliente' => $cliente]);
         }
-    
+
         // Si la autenticación falla, devuelve un mensaje de error
-        return response()->json(['error' => 'Credenciales incorrectas'],401);
-}
-    
+        return response()->json(['error' => 'Credenciales incorrectas'], 401);
+    }
 }

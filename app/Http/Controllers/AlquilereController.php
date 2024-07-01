@@ -40,6 +40,8 @@ class AlquilereController extends Controller
     {
         $alquilere = new Alquilere();
          $alquilere->nombre = $request->nombre;
+         $alquilere->apertura = $request->apertura;
+         $alquilere->habilitacion = $request->habilitacion;
          $alquilere->precio_id = $request->precio_id;
          $alquilere->cliente_id = $request->cliente_id;
          $alquilere->casilla_id = $request->casilla_id;
@@ -80,6 +82,8 @@ class AlquilereController extends Controller
     public function show(Alquilere $alquilere)
     {
         $alquilere->cliente = $alquilere->cliente;
+        $alquilere->apertura = $alquilere->apertura;
+         $alquilere->habilitacion = $alquilere->habilitacion;
          $alquilere->casilla = $alquilere->casilla;
          $alquilere->categoria = $alquilere->categoria;
          $alquilere->precio = $alquilere->precio;
@@ -112,7 +116,10 @@ class AlquilereController extends Controller
     if ($request->fin_fecha != $alquilere->fin_fecha) {
         // Actualizar los datos del alquiler
         $alquilere->nombre = $request->nombre;
+        
         $alquilere->cliente_id = $request->cliente_id;
+        $alquilere->apertura = $request->apertura;
+        $alquilere->habilitacion = $request->habilitacion;
         $alquilere->casilla_id = $request->casilla_id;
         $alquilere->categoria_id = $request->categoria_id;
         $alquilere->precio_id = $request->precio_id;
@@ -130,6 +137,8 @@ class AlquilereController extends Controller
         // Crear un nuevo alquiler con los mismos datos del alquiler original
         $nuevoAlquiler = new Alquilere();
         $nuevoAlquiler->nombre = $alquilere->nombre;
+        $nuevoAlquiler->apertura = $alquilere->apertura;
+        $nuevoAlquiler->habilitacion = $alquilere->habilitacion;
         $nuevoAlquiler->cliente_id = $alquilere->cliente_id;
         $nuevoAlquiler->casilla_id = $alquilere->casilla_id;
         $nuevoAlquiler->categoria_id = $alquilere->categoria_id;
@@ -147,6 +156,8 @@ class AlquilereController extends Controller
 
     // Si la fecha final no ha cambiado, actualizar el alquiler existente con todos los datos del request
     $alquilere->nombre = $request->nombre;
+    $alquilere->apertura = $request->apertura;
+    $alquilere->habilitacion = $request->habilitacion;
     $alquilere->cliente_id = $request->cliente_id;
     $alquilere->casilla_id = $request->casilla_id;
     $alquilere->categoria_id = $request->categoria_id;
