@@ -12,8 +12,8 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Confirmationagbcmail;
 use Illuminate\Http\Request;
-
 use Carbon\Carbon;
+
 
 class AlquilereController extends Controller
 {
@@ -40,6 +40,8 @@ class AlquilereController extends Controller
     {
         $alquilere = new Alquilere();
          $alquilere->nombre = $request->nombre;
+         $alquilere->apertura = $request->apertura;
+         $alquilere->habilitacion = $request->habilitacion;
          $alquilere->precio_id = $request->precio_id;
          $alquilere->cliente_id = $request->cliente_id;
          $alquilere->casilla_id = $request->casilla_id;
@@ -84,7 +86,8 @@ class AlquilereController extends Controller
          $alquilere->categoria = $alquilere->categoria;
          $alquilere->precio = $alquilere->precio;
          $alquilere->estado_pago = $alquilere->estado_pago;
-
+         $alquilere->apertura = $request->apertura;
+         $alquilere->habilitacion = $request->habilitacion;
 
         $alquilere->url_pdf = url('web/reportes/alquileres/', $alquilere->id);
         return $alquilere;
@@ -107,11 +110,78 @@ class AlquilereController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Alquilere $alquilere)
-{
-    // Verificar si la fecha final ha cambiado
-    if ($request->fin_fecha != $alquilere->fin_fecha) {
-        // Actualizar los datos del alquiler
+    {
+        // Verificar si la fecha final ha cambiado
+        if ($request->fin_fecha != $alquilere->fin_fecha) {
+<<<<<<< HEAD
+            // Actualizar los datos del alquiler
+=======
+            // Actualizar los datos del alquiler original
+>>>>>>> 07fa7d248f5e519f4c5e53b135dcda7edd7f62d7
+            $alquilere->nombre = $request->nombre;
+            $alquilere->cliente_id = $request->cliente_id;
+            $alquilere->casilla_id = $request->casilla_id;
+            $alquilere->categoria_id = $request->categoria_id;
+            $alquilere->precio_id = $request->precio_id;
+            $alquilere->ini_fecha = $request->ini_fecha;
+            $alquilere->fin_fecha = $request->fin_fecha;
+            $alquilere->estado_pago = $request->estado_pago;
+<<<<<<< HEAD
+    
+            // Cambiar el estado del alquiler
+            $alquilere->estado = 0;
+    
+            // Guardar los cambios en el alquiler
+            $alquilere->save();
+    
+            // Crear un nuevo alquiler con los mismos datos del alquiler original
+            $nuevoAlquiler = new Alquilere();
+            $nuevoAlquiler->nombre = $request->nombre; // Solo se añade el nombre nuevo
+            $nuevoAlquiler->cliente_id = $alquilere->cliente_id;
+            $nuevoAlquiler->casilla_id = $alquilere->casilla_id;
+            $nuevoAlquiler->categoria_id = $alquilere->categoria_id;
+            $nuevoAlquiler->precio_id = $alquilere->precio_id;
+            $nuevoAlquiler->ini_fecha = $alquilere->ini_fecha;
+            $nuevoAlquiler->fin_fecha = $alquilere->fin_fecha;
+            $nuevoAlquiler->estado_pago = $alquilere->estado_pago;
+            $nuevoAlquiler->cajero_id = $alquilere->cajero_id;
+    
+            // Guardar el nuevo alquiler
+            $nuevoAlquiler->save();
+    
+            return $alquilere;
+        }
+    
+        // Si la fecha final no ha cambiado, actualizar el alquiler existente con todos los datos del request
+=======
+            $alquilere->apertura = $request->apertura;
+         $alquilere->habilitacion = $request->habilitacion;
+            $alquilere->estado = 0; // Cambiar el estado del alquiler original a 0
+            $alquilere->save();
+    
+            // Crear un nuevo alquiler con los mismos datos del alquiler original y asignar el cajero_id
+            $nuevoAlquiler = new Alquilere();
+            $nuevoAlquiler->nombre = $request->nombre;
+            $nuevoAlquiler->cliente_id = $request->cliente_id;
+            $nuevoAlquiler->casilla_id = $request->casilla_id;
+            $nuevoAlquiler->categoria_id = $request->categoria_id;
+            $alquilere->apertura = $request->apertura;
+         $alquilere->habilitacion = $request->habilitacion;
+            $nuevoAlquiler->precio_id = $request->precio_id;
+            $nuevoAlquiler->ini_fecha = $request->ini_fecha;
+            $nuevoAlquiler->fin_fecha = $request->fin_fecha;
+            $nuevoAlquiler->estado_pago = $request->estado_pago;
+            $nuevoAlquiler->cajero_id = $request->cajero_id; // Asignar el cajero_id al nuevo alquiler
+            $nuevoAlquiler->save();
+    
+            return $nuevoAlquiler;
+        }
+    
+        // Si la fecha final no ha cambiado, actualizar el alquiler existente con todos los datos del request excepto cajero_id
+>>>>>>> 07fa7d248f5e519f4c5e53b135dcda7edd7f62d7
         $alquilere->nombre = $request->nombre;
+        $alquilere->apertura = $request->apertura;
+         $alquilere->habilitacion = $request->habilitacion;
         $alquilere->cliente_id = $request->cliente_id;
         $alquilere->casilla_id = $request->casilla_id;
         $alquilere->categoria_id = $request->categoria_id;
@@ -119,57 +189,35 @@ class AlquilereController extends Controller
         $alquilere->ini_fecha = $request->ini_fecha;
         $alquilere->fin_fecha = $request->fin_fecha;
         $alquilere->estado_pago = $request->estado_pago;
+<<<<<<< HEAD
         $alquilere->cajero_id = $request->cajero_id;
-
-        // Cambiar el estado del alquiler
-        $alquilere->estado = 0;
-
+    
         // Guardar los cambios en el alquiler
         $alquilere->save();
-
-        // Crear un nuevo alquiler con los mismos datos del alquiler original
-        $nuevoAlquiler = new Alquilere();
-        $nuevoAlquiler->nombre = $alquilere->nombre;
-        $nuevoAlquiler->cliente_id = $alquilere->cliente_id;
-        $nuevoAlquiler->casilla_id = $alquilere->casilla_id;
-        $nuevoAlquiler->categoria_id = $alquilere->categoria_id;
-        $nuevoAlquiler->precio_id = $alquilere->precio_id;
-        $nuevoAlquiler->ini_fecha = $alquilere->ini_fecha;
-        $nuevoAlquiler->fin_fecha = $alquilere->fin_fecha;
-        $nuevoAlquiler->estado_pago = $alquilere->estado_pago;
-        $nuevoAlquiler->cajero_id = $alquilere->cajero_id;
-
-        // Guardar el nuevo alquiler
-        $nuevoAlquiler->save();
-
+        $cliente = Cliente::find($request->cliente_id);
+    
+        if ($cliente) {
+           // Envía un correo electrónico al cliente
+           Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
+        } else {
+           // Manejar caso en el que no se encuentra el cliente
+           // Puedes agregar el código para manejar este caso según tus necesidades
+        }
+=======
+        // No actualizar el cajero_id aquí
+        $alquilere->save();
+    
+        $cliente = Cliente::find($request->cliente_id);
+        if ($cliente) {
+            // Envía un correo electrónico al cliente
+            Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
+        }
+    
+>>>>>>> 07fa7d248f5e519f4c5e53b135dcda7edd7f62d7
         return $alquilere;
     }
+    
 
-    // Si la fecha final no ha cambiado, actualizar el alquiler existente con todos los datos del request
-    $alquilere->nombre = $request->nombre;
-    $alquilere->cliente_id = $request->cliente_id;
-    $alquilere->casilla_id = $request->casilla_id;
-    $alquilere->categoria_id = $request->categoria_id;
-    $alquilere->precio_id = $request->precio_id;
-    $alquilere->ini_fecha = $request->ini_fecha;
-    $alquilere->fin_fecha = $request->fin_fecha;
-    $alquilere->estado_pago = $request->estado_pago;
-    $alquilere->cajero_id = $request->cajero_id;
-
-    // Guardar los cambios en el alquiler
-    $alquilere->save();
-    $cliente = Cliente::find($request->cliente_id);
-
-    if ($cliente) {
-       // Envía un correo electrónico al cliente
-       
-       Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-   } else {
-       // Manejar caso en el que no se encuentra el cliente
-       // Puedes agregar el código para manejar este caso según tus necesidades
-   }
-    return $alquilere;
-}
 
     
 
@@ -194,7 +242,25 @@ class AlquilereController extends Controller
         return $alquilere;
     }
 
-    
+    public function updateVencidos()
+    {
+        $today = Carbon::today();
+        $vencidos = Alquilere::where('fin_fecha', '<', $today)->get();
+
+        foreach ($vencidos as $alquilere) {
+            // $alquilere->estado = 1; // Cambia el estado del alquiler a 'vencido'
+            // $alquilere->save();
+
+            // Actualizar el estado de la casilla asociada
+            $casilla = Casilla::find($alquilere->casilla_id);
+            if ($casilla) {
+                $casilla->estado = 4; // Por ejemplo, cambiar el estado de la casilla a 'disponible'
+                $casilla->save();
+            }
+        }
+
+        return response()->json(['message' => 'Estados de alquileres y casillas actualizados correctamente']);
+    }
 
    
 }

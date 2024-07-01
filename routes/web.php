@@ -72,6 +72,7 @@ Route::group(['prefix'=>'cajero'],function(){
     Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
+    Route::put('alquileres/actualizarEstado/{id}', ['AlquilereController@actualizarEstado']);
 
 
 
