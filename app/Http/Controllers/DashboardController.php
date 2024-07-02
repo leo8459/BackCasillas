@@ -1,6 +1,6 @@
 <?php
-
 namespace App\Http\Controllers;
+
 use App\Models\Alquilere;
 use App\Models\Cliente;
 use App\Models\Casilla;
@@ -8,13 +8,15 @@ use App\Models\Seccione;
 use App\Models\User;
 use App\Models\Precio;
 use App\Models\Categoria;
-
-
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function patito() {
+        // Obtener la fecha de hoy
+        $today = Carbon::today();
+
         return [
             "alquileres" => Alquilere::where('estado', 1)->count(),
             "users" => User::where('estado', 1)->count(),
@@ -33,28 +35,28 @@ class DashboardController extends Controller
             "pequeñasocupadas" => Alquilere::whereHas('casilla', function ($query) {
                 $query->where('categoria_id', 1);
             })->where('estado', 1)->count(),
-
-
             "medianasocupadas" => Alquilere::whereHas('casilla', function ($query) {
                 $query->where('categoria_id', 2);
             })->where('estado', 1)->count(),
-
-
             "gabetaocupadas" => Alquilere::whereHas('casilla', function ($query) {
-                 $query->where('categoria_id', 3);
-                        })->where('estado', 1)->count(),
-
-
+                $query->where('categoria_id', 3);
+            })->where('estado', 1)->count(),
             "cajonocupadas" => Alquilere::whereHas('casilla', function ($query) {
                 $query->where('categoria_id', 4);
-                                    })->where('estado', 1)->count(),
-                        
-                        
-            
-
-
-           
+            })->where('estado', 1)->count(),
+            "alquileresHoy" => Alquilere::whereDate('created_at', $today)->count(),
+            "pequeñasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 1);
+            })->count(),
+            "medianasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 2);
+            })->count(),
+            "gabetasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 3);
+            })->count(),
+            "cajonesHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 4);
+            })->count()
         ];
     }
-    
 }

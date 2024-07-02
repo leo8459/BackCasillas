@@ -172,6 +172,38 @@ class CasillaController extends Controller
     
         return $response;
     }
+    public function obtenerTodasLasCasillas()
+{
+    $casillas = Casilla::leftJoin('alquileres', function ($join) {
+            $join->on('casillas.id', '=', 'alquileres.casilla_id')
+                ->where('alquileres.estado', '=', 1);
+        })
+        ->leftJoin('clientes', 'alquileres.cliente_id', '=', 'clientes.id')
+        ->leftJoin('categorias', 'casillas.categoria_id', '=', 'categorias.id')
+        ->leftJoin('secciones', 'casillas.seccione_id', '=', 'secciones.id')
+        ->select(
+            'casillas.id AS casilla_id',
+            'casillas.nombre AS casilla_nombre',
+            'casillas.observacion AS casilla_observacion',
+            'casillas.ubicacion AS casilla_ubicacion',
+            'categorias.nombre AS categoria_nombre',
+            'secciones.nombre AS seccion_nombre',
+            'casillas.seccione_id',
+            'casillas.llaves_id',
+            'casillas.estado AS casilla_estado',
+            'alquileres.id AS alquiler_id',
+            'alquileres.nombre AS alquiler_nombre',
+            'alquileres.cliente_id',
+            'alquileres.estado AS alquiler_estado',
+            'clientes.nombre AS cliente_nombre',
+            'clientes.carnet'
+        )
+        ->get();
+
+    return response()->json([
+        'casillas' => $casillas,
+    ]);
+}
 
    
     

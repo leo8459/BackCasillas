@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CasillaController;
 
 
 Route::group(['prefix'=>'api'],function(){
@@ -10,6 +11,7 @@ Route::group(['prefix'=>'api'],function(){
     Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/ver3/{busquedaid}','CasillaController@busquedas');//solo para logear
+    Route::get('/todas-las-casillas','CasillaController@obtenerTodasLasCasillas');
 
 
     Route::get('/dashboard','DashboardController@patito');//solo para logear
@@ -64,6 +66,7 @@ Route::group(['prefix'=>'cajero'],function(){
     Route::apiResource('/precios','PrecioController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/cajeros','CajeroController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/llaves','LlavesController');  //editar agragar eliminar listar apiresource
+    Route::get('/todas-las-casillas','CasillaController@obtenerTodasLasCasillas');
 
     Route::post('/login3','CajeroController@login3');//solo para logear
     Route::get('/ver3/{busquedaid}','CasillaController@busquedas');//solo para logear
