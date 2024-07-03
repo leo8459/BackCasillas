@@ -1,6 +1,6 @@
 <?php
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers;
 use App\Models\Alquilere;
 use App\Models\Cliente;
 use App\Models\Casilla;
@@ -8,14 +8,51 @@ use App\Models\Seccione;
 use App\Models\User;
 use App\Models\Precio;
 use App\Models\Categoria;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
+
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function patito() {
-        // Obtener la fecha de hoy
         $today = Carbon::today();
+
+        // Consulta para obtener la suma de multas de casillas pequeñas con estado 1 del día de hoy
+        $totalMultasPequenas = Alquilere::join('casillas', 'alquileres.casilla_id', '=', 'casillas.id')
+            ->join('categorias', 'casillas.categoria_id', '=', 'categorias.id')
+            ->where('categorias.nombre', 'Pequeña')
+            ->where('alquileres.estado', 1)
+            ->whereDate('alquileres.created_at', $today)
+            ->sum(DB::raw('CAST(alquileres.nombre AS DECIMAL(10, 2))'));
+
+        // Consulta para obtener la suma de multas de casillas medianas con estado 1 del día de hoy
+        $totalMultasMedianas = Alquilere::join('casillas', 'alquileres.casilla_id', '=', 'casillas.id')
+            ->join('categorias', 'casillas.categoria_id', '=', 'categorias.id')
+            ->where('categorias.nombre', 'Mediana')
+            ->where('alquileres.estado', 1)
+            ->whereDate('alquileres.created_at', $today)
+            ->sum(DB::raw('CAST(alquileres.nombre AS DECIMAL(10, 2))'));
+
+        // Consulta para obtener la suma de multas de gabeta con estado 1 del día de hoy
+        $totalMultasGabeta = Alquilere::join('casillas', 'alquileres.casilla_id', '=', 'casillas.id')
+            ->join('categorias', 'casillas.categoria_id', '=', 'categorias.id')
+            ->where('categorias.nombre', 'Gabeta')
+            ->where('alquileres.estado', 1)
+            ->whereDate('alquileres.created_at', $today)
+            ->sum(DB::raw('CAST(alquileres.nombre AS DECIMAL(10, 2))'));
+
+        // Consulta para obtener la suma de multas de cajón con estado 1 del día de hoy
+        $totalMultasCajon = Alquilere::join('casillas', 'alquileres.casilla_id', '=', 'casillas.id')
+            ->join('categorias', 'casillas.categoria_id', '=', 'categorias.id')
+            ->where('categorias.nombre', 'Cajón')
+            ->where('alquileres.estado', 1)
+            ->whereDate('alquileres.created_at', $today)
+            ->sum(DB::raw('CAST(alquileres.nombre AS DECIMAL(10, 2))'));
+
+        // Suma total de todas las multas
+        $totalMultas = $totalMultasPequenas + $totalMultasMedianas + $totalMultasGabeta + $totalMultasCajon;
 
         return [
             "alquileres" => Alquilere::where('estado', 1)->count(),
@@ -44,19 +81,11 @@ class DashboardController extends Controller
             "cajonocupadas" => Alquilere::whereHas('casilla', function ($query) {
                 $query->where('categoria_id', 4);
             })->where('estado', 1)->count(),
-            "alquileresHoy" => Alquilere::whereDate('created_at', $today)->count(),
-            "pequeñasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
-                $query->where('categoria_id', 1);
-            })->count(),
-            "medianasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
-                $query->where('categoria_id', 2);
-            })->count(),
-            "gabetasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
-                $query->where('categoria_id', 3);
-            })->count(),
-            "cajonesHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
-                $query->where('categoria_id', 4);
-            })->count()
+            "total_multas_pequenas" => $totalMultasPequenas,
+            "total_multas_medianas" => $totalMultasMedianas,
+            "total_multas_gabeta" => $totalMultasGabeta,
+            "total_multas_cajon" => $totalMultasCajon,
+            "total_multas" => $totalMultas,
         ];
     }
 }
