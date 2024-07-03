@@ -72,15 +72,35 @@ class DashboardController extends Controller
             "pequeñasocupadas" => Alquilere::whereHas('casilla', function ($query) {
                 $query->where('categoria_id', 1);
             })->where('estado', 1)->count(),
+
+
             "medianasocupadas" => Alquilere::whereHas('casilla', function ($query) {
                 $query->where('categoria_id', 2);
             })->where('estado', 1)->count(),
+
+
             "gabetaocupadas" => Alquilere::whereHas('casilla', function ($query) {
-                $query->where('categoria_id', 3);
-            })->where('estado', 1)->count(),
+                 $query->where('categoria_id', 3);
+                        })->where('estado', 1)->count(),
+
+
             "cajonocupadas" => Alquilere::whereHas('casilla', function ($query) {
                 $query->where('categoria_id', 4);
-            })->where('estado', 1)->count(),
+                                    })->where('estado', 1)->count(),
+                                    "alquileresHoy" => Alquilere::whereDate('created_at', $today)->count(),
+            "pequeñasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 1);
+            })->count(),
+            "medianasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 2);
+            })->count(),
+            "gabetasHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 3);
+            })->count(),
+            "cajonesHoy" => Alquilere::whereDate('created_at', $today)->whereHas('casilla', function ($query) {
+                $query->where('categoria_id', 4);
+            })->count(),
+
             "total_multas_pequenas" => $totalMultasPequenas,
             "total_multas_medianas" => $totalMultasMedianas,
             "total_multas_gabeta" => $totalMultasGabeta,
