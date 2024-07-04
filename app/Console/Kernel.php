@@ -14,17 +14,14 @@ class Kernel extends ConsoleKernel
      * @return void
      */
     protected function schedule(Schedule $schedule)
-    {
-        $schedule->command('emails:send')->everyMinute();
-        $schedule->command('emails:send2')->everyMinute();
-        $schedule->command('emails:send3')->everyMinute();
-        $schedule->command('alquileres:updateVencidos')->everyMinute();
-    //     // Ejecutar emails:send una vez y luego cada semana a la misma hora
-    // $schedule->command('emails:send')->weekly()->onOneServer()->at('08:00'); 
+{
+    $schedule->command('emails:send')->dailyAt('23:00');
+    $schedule->command('emails:send2')->dailyAt('23:00');
+    $schedule->command('emails:send3')->dailyAt('23:00');
+    $schedule->command('alquileres:updateVencidos')->dailyAt('23:00');
+    $schedule->command('alquileres:updateAllToOcupadas')->dailyAt('23:00');
+}
 
-    // // Ejecutar emails:send2 una vez y luego cada semana a la misma hora
-    // $schedule->command('emails:send2')->weekly()->onOneServer()->at('08:00');
-    }
     
 
 
