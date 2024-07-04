@@ -6,8 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Alquilere;
 use Carbon\Carbon;
-// use App\Mail\Confirmationagbcmail;
-
+use Illuminate\Support\Facades\Log;
 
 class SendEmails extends Command
 {
@@ -15,30 +14,37 @@ class SendEmails extends Command
     protected $description = 'Send emails to notify customers when their rental expires';
 
     public function handle()
-{
-    $alquileres = Alquilere::where('fin_fecha', '<=', Carbon::now())->get();
+    {
+        $hoy = Carbon::now();
+        $fecha_hace_7_dias = $hoy->copy()->subDays(7);
 
-    foreach ($alquileres as $alquilere) {
-        $cliente = $alquilere->cliente;
-        $casilla = $alquilere->casilla; // Accede a la relación "casilla" desde el modelo Alquiler
 
-        // Calcular los días transcurridos desde la fecha de vencimiento hasta hoy
-        $dias_transcurridos = Carbon::parse($alquilere->fin_fecha)->diffInDays(Carbon::now());
+        $alquileres = Alquilere::where('fin_fecha', '=', $fecha_hace_7_dias->toDateString())->get();
 
-        // Verificar si la diferencia en días es mayor que 15
-        if ($dias_transcurridos < 46) {
-            $subject = '¡Su alquiler ha vencido!';
-            $body = 'Estimado/a ' . $cliente->nombre . ', su alquiler de la casilla número ' . $casilla->nombre . ' ha vencido el día ' . Carbon::parse($alquilere->fin_fecha)->format('d/m/Y') . '. Han pasado ' . $dias_transcurridos . ' días desde entonces. Por favor, apersonarse a la ventanilla 2 para realizar la renovación correspondiente de su casillas, Pasado los 45 dias su casilla pasara a estar disponible para un nuevo usuario, Gracias.';
+        if ($alquileres->isEmpty()) {
+        } else {
+        }
 
-            // Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente, $subject, $body));
+        foreach ($alquileres as $alquilere) {
+            $cliente = $alquilere->cliente;
+            $casilla = $alquilere->casilla;
 
-            Mail::raw($body, function ($message) use ($cliente, $subject) {
-                $message->to($cliente->email);
-                $message->subject($subject);
-            });
+            // Calcular los días transcurridos desde la fecha de vencimiento hasta hoy
+            $dias_transcurridos = Carbon::parse($alquilere->fin_fecha)->diffInDays($hoy);
+
+            // Verificar si la diferencia en días es exactamente 7
+            if ($dias_transcurridos == 7) {
+                $subject = '¡Su alquiler ha vencido!';
+                $body = 'Estimado/a ' . $cliente->nombre . ', su alquiler de la casilla número ' . $casilla->nombre . ' ha vencido el día ' . Carbon::parse($alquilere->fin_fecha)->format('d/m/Y') . '. Han pasado ' . $dias_transcurridos . ' días desde entonces. Por favor, apersonarse a la ventanilla 32 para realizar la renovación correspondiente de su casilla. Pasado los días ya mencionados, pasará a estar disponible para un nuevo usuario. Gracias.';
+
+                // Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente, $subject, $body));
+
+                Mail::raw($body, function ($message) use ($cliente, $subject) {
+                    $message->to($cliente->email);
+                    $message->subject($subject);
+                });
+            } else {
+            }
         }
     }
-}
-
-
 }

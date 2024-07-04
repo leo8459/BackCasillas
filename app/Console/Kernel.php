@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('emails:send')->everyMinute();
         $schedule->command('emails:send2')->everyMinute();
-        $schedule->command('alquileres:updateVencidos')->daily();
+        $schedule->command('emails:send3')->everyMinute();
+        $schedule->command('alquileres:updateVencidos')->everyMinute();
     //     // Ejecutar emails:send una vez y luego cada semana a la misma hora
     // $schedule->command('emails:send')->weekly()->onOneServer()->at('08:00'); 
 
