@@ -192,15 +192,14 @@ class AlquilereController extends Controller
      */
     public function destroy(Alquilere $alquilere)
     {
-
         $casilla = $alquilere->casilla; // Obtener la casilla asociada al alquiler
-    if ($casilla) {
-        $casilla->estado = 1; // Cambiar el estado de la casilla a 1
-        $casilla->save();
-    }
-        $alquilere->estado = 0;
-        $alquilere->save();
-        return $alquilere;
+                      if ($casilla) {
+                                $casilla->estado = 1; // Cambiar el estado de la casilla a 1
+                                $casilla->save();
+                                  }
+                                $alquilere->estado = 0;
+                                $alquilere->save();
+                                return $alquilere;
     }
 
     public function updateVencidos()
@@ -225,7 +224,6 @@ class AlquilereController extends Controller
 
     public function updateCasillasSeleccionadas(Request $request)
 {
-    \Log::info('Request data:', $request->all());
 
     // Validar el request
     $request->validate([
@@ -263,6 +261,40 @@ class AlquilereController extends Controller
     return response()->json(['status' => 'success', 'message' => 'Casillas actualizadas y correos enviados con éxito']);
 }
 
-    
+public function updateAllToOcupadas()
+{
+
+    try {
+        // Obtener todas las casillas en estado "Con Correspondencia" (estado 2)
+        $alquileres = Alquilere::whereHas('casilla', function($query) {
+            $query->where('estado', 2);
+        })->get();
+
+
+        $errors = [];
+
+        foreach ($alquileres as $alquilere) {
+            try {
+                // Actualizar el estado de la casilla asociada
+                $casilla = Casilla::find($alquilere->casilla_id);
+                if ($casilla) {
+                    $casilla->estado = 0; // Cambiar estado a "Ocupado"
+                    $casilla->save();
+                }
+            } catch (\Exception $e) {
+                $errors[] = "Error actualizando alquiler ID: " . $alquilere->id . " - " . $e->getMessage();
+            }
+        }
+
+        if (count($errors) > 0) {
+            return response()->json(['status' => 'error', 'message' => $errors], 500);
+        }
+
+
+        return response()->json(['status' => 'success', 'message' => 'Todas las casillas "Con Correspondencia" han sido actualizadas a "Ocupado" y correos enviados con éxito']);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'Error en el proceso de actualización a "Ocupadas"'], 500);
+    }
+}
     
 }

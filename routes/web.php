@@ -68,7 +68,7 @@ Route::group(['prefix'=>'cajero'],function(){
     Route::apiResource('/llaves','LlavesController');  //editar agragar eliminar listar apiresource
     Route::get('/todas-las-casillas','CasillaController@obtenerTodasLasCasillas');
 
-
+    Route::post('update-all-to-ocupadas', 'AlquilereController@updateAllToOcupadas');
     Route::post('update-casillas-seleccionadas','AlquilereController@updateCasillasSeleccionadas');
     Route::post('/login3','CajeroController@login3');//solo para logear
     Route::get('/ver3/{busquedaid}','CasillaController@busquedas');//solo para logear
