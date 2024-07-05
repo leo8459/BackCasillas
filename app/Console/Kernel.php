@@ -15,11 +15,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
 {
-    $schedule->command('emails:send')->dailyAt('23:00');
-    $schedule->command('emails:send2')->dailyAt('23:00');
-    $schedule->command('emails:send3')->dailyAt('23:00');
-    $schedule->command('alquileres:updateVencidos')->dailyAt('23:00');
-    $schedule->command('alquileres:updateAllToOcupadas')->dailyAt('23:00');
+    $schedule->command('emails:send')->dailyAt('7:00');
+    $schedule->command('emails:send2')->dailyAt('7:00');
+    $schedule->command('emails:send3')->dailyAt('7:00');
+    $schedule->command('alquileres:updateVencidos')->dailyAt('7:00');
+    $schedule->command('alquileres:updateAllToOcupadas')->dailyAt('7:00');
 }
 
     
