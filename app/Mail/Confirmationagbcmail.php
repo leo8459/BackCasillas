@@ -29,7 +29,7 @@ class Confirmationagbcmail extends Mailable
 {
     return $this->view('emails.registro-exitoso')
         ->with(['cliente' => $this->cliente]) // Cambia '->' a '=>'
-        ->subject('Confirm Your Email Address');
+        ->subject('Mensaje Casillas');
 }
 
 }
