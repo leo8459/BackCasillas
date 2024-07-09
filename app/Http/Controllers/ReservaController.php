@@ -32,6 +32,15 @@ class ReservaController extends Controller
         $reserva->carnet = $request->carnet;
         $reserva->telefono = $request->telefono;
         $reserva->casilla_id = $request->casilla_id;
+        // Establecer el estado de la casilla a 5
+        $casilla = Casilla::find($request->casilla_id);
+        if ($casilla) {
+            $casilla->estado = 5;
+            $casilla->save(); // Guarda los cambios en la casilla
+        }
+
+        $reserva->save();  // Guarda la reserva en la base de datos
+
     }
 
     /**
@@ -58,6 +67,8 @@ class ReservaController extends Controller
         $reserva->carnet = $request->carnet;
         $reserva->telefono = $request->telefono;
         $reserva->casilla_id = $request->casilla_id;
+        $reserva->save();  // Guarda la reserva en la base de datos
+
     }
 
     /**

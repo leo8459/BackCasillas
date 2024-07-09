@@ -20,6 +20,8 @@ class Kernel extends ConsoleKernel
     $schedule->command('emails:send3')->dailyAt('7:00');
     $schedule->command('alquileres:updateVencidos')->dailyAt('7:00');
     $schedule->command('alquileres:updateAllToOcupadas')->dailyAt('7:00');
+    $schedule->command('reservas:update-estado')->dailyAt('7:00');
+
 }
 
     

@@ -1,2 +1,4 @@
 
 php artisan make:model Reserva -rm --api
+
+php artisan migrate --path=/database/migrations/2024_07_08_123410_create_reservas_table.php
