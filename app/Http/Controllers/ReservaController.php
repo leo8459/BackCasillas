@@ -6,6 +6,10 @@ use App\Models\Reserva;
 use Illuminate\Http\Request;
 use App\Models\Casilla;
 use App\Models\Cliente;
+use App\Notifications\ReservaCasillaNotification;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log; // Asegúrate de importar la clase Log
+
 class ReservaController extends Controller
 {
     /**
@@ -27,11 +31,15 @@ class ReservaController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info($request->all());
         $reserva = new Reserva();
         $reserva->nombre = $request->nombre;
         $reserva->carnet = $request->carnet;
         $reserva->telefono = $request->telefono;
+        $reserva->email = $request->email;
+        $reserva->direccion = $request->direccion;
         $reserva->casilla_id = $request->casilla_id;
+
         // Establecer el estado de la casilla a 5
         $casilla = Casilla::find($request->casilla_id);
         if ($casilla) {
@@ -41,6 +49,10 @@ class ReservaController extends Controller
 
         $reserva->save();  // Guarda la reserva en la base de datos
 
+        // Enviar notificación por correo electrónico
+        Notification::route('mail', $reserva->email)->notify(new ReservaCasillaNotification($reserva, $casilla));
+
+        return response()->json(['message' => 'Reserva creada y correo enviado'], 201);
     }
 
     /**
@@ -66,6 +78,8 @@ class ReservaController extends Controller
         $reserva->nombre = $request->nombre;
         $reserva->carnet = $request->carnet;
         $reserva->telefono = $request->telefono;
+        $reserva->email = $request->email;
+        $reserva->direccion = $request->direccion;
         $reserva->casilla_id = $request->casilla_id;
         $reserva->save();  // Guarda la reserva en la base de datos
 

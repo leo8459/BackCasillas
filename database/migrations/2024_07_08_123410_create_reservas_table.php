@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('nombre')->nullable();
             $table->string('carnet')->nullable();
             $table->string('telefono')->nullable();
+            $table->string('direccion')->nullable();
+            $table->string('email')->nullable();
             $table->foreignId('casilla_id')->nullable()->constrained('casillas');
         });
     }
