@@ -16,7 +16,18 @@ Route::group(['prefix'=>'api'],function(){
 
     Route::get('/dashboard','DashboardController@patito');//solo para logear
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
+    Route::get('/todas-las-casillas','CasillaController@obtenerTodasLasCasillas');
 
+    Route::post('/reservar-casillas', 'AlquilereController@reservarCasillas');
+    Route::post('update-all-to-ocupadas', 'AlquilereController@updateAllToOcupadas');
+    Route::post('update-casillas-seleccionadas','AlquilereController@updateCasillasSeleccionadas');
+    Route::post('/login3','CajeroController@login3');//solo para logear
+    Route::get('/ver3/{busquedaid}','CasillaController@busquedas');//solo para logear
+
+    Route::get('/ver1/{seccionId}','CasillaController@obtenercasillas');//solo para logear
+    Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
+    Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
+    Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
 
     // Route::get('/ver1/{seccionId}', [CasillaController::class, 'obtenercasillas']);
 
