@@ -91,6 +91,13 @@ Route::group(['prefix'=>'cajero'],function(){
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
 
+// En routes/web.php o routes/api.php
+Route::get('/ocupadas', 'AlquilereController@getCasillasOcupadas');
+Route::get('/libres','AlquilereController@getCasillasLibres');
+Route::get('/correspondencia', 'AlquilereController@getCasillasConCorrespondencia');
+Route::get('/mantenimiento', 'AlquilereController@getCasillasMantenimiento');
+Route::get('/vencidas', 'AlquilereController@getCasillasVencidas');
+Route::get('/reservadas','AlquilereController@getCasillasReservadas');
 
 
     Route::get('/dashboard','DashboardController@patito');//solo para logear

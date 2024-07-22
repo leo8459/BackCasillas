@@ -296,5 +296,40 @@ public function updateAllToOcupadas()
         return response()->json(['status' => 'error', 'message' => 'Error en el proceso de actualización a "Ocupadas"'], 500);
     }
 }
+private function getCasillasByEstado($estado)
+    {
+        $casillas = Casilla::where('estado', $estado)->get();
+        return response()->json($casillas);
+    }
+
+    public function getCasillasOcupadas()
+    {
+        return $this->getCasillasByEstado(0);
+    }
+
+    public function getCasillasLibres()
+    {
+        return $this->getCasillasByEstado(1);
+    }
+
+    public function getCasillasConCorrespondencia()
+    {
+        return $this->getCasillasByEstado(2);
+    }
+
+    public function getCasillasMantenimiento()
+    {
+        return $this->getCasillasByEstado(3);
+    }
+
+    public function getCasillasVencidas()
+    {
+        return $this->getCasillasByEstado(4);
+    }
+
+    public function getCasillasReservadas()
+    {
+        return $this->getCasillasByEstado(5);
+    }
     
 }
