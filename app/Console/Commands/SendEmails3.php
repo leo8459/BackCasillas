@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Alquilere;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+
 class SendEmails3 extends Command
 {
     protected $signature = 'emails:send3';
-    protected $description = 'Send emails to notify customers when their rental expires today';
+    protected $description = 'Send emails to notify customers when their rental expires';
 
     public function handle()
     {
@@ -29,9 +30,10 @@ class SendEmails3 extends Command
             $casilla = $alquilere->casilla;
 
             $subject = '¡Su alquiler vence hoy!';
+            $body = 'Estimado/a ' . $cliente->nombre . ', su alquiler de la casilla número ' . $casilla->nombre . ' vence hoy, ' . Carbon::parse($alquilere->fin_fecha)->format('d/m/Y') . '. Por favor, apersonarse a la ventanilla 32 para realizar la renovación correspondiente de su casilla. Gracias.';
 
-            // Enviar el correo usando la vista Blade
-            Mail::send('emails.alquiler_vencimiento_hoy', compact('cliente', 'casilla', 'alquilere'), function ($message) use ($cliente, $subject) {
+            // Envía el correo electrónico
+            Mail::raw($body, function ($message) use ($cliente, $subject) {
                 $message->to($cliente->email);
                 $message->subject($subject);
             });
