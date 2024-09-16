@@ -40,7 +40,7 @@ class CasillaController extends Controller
          $casilla->seccione_id = $request->seccione_id;
          $casilla->llaves_id = $request->llaves_id;
          $casilla->observacion = $request->observacion;
-         $casilla->ubicacion = $request->ubicacion;
+         $casilla->departamento  = $request->departamento ;
 
 
          $casilla->save();
@@ -77,7 +77,7 @@ class CasillaController extends Controller
          $casilla->categoria_id = $request->categoria_id;
          $casilla->seccione_id = $request->seccione_id;
          $casilla->estado= $request->estado;
-         $casilla->ubicacion = $request->ubicacion;
+         $casilla->departamento  = $request->departamento ;
          $casilla->llaves_id = $request->llaves_id;
 
 
@@ -121,7 +121,7 @@ class CasillaController extends Controller
                 'casillas.id AS casilla_id',
                 'casillas.nombre AS casilla_nombre',
                 'casillas.observacion AS casilla_observacion',
-                'casillas.ubicacion AS casilla_ubicacion',
+                'casillas.departamento  AS casilla_departamento',
                 'categorias.nombre AS categoria_nombre',
                 'casillas.seccione_id',
                 'casillas.llaves_id',
@@ -153,7 +153,7 @@ class CasillaController extends Controller
                 'casillas.id AS casilla_id',
                 'casillas.nombre AS casilla_nombre',
                 'casillas.observacion AS casilla_observacion',
-                'casillas.ubicacion AS casilla_ubicacion',
+                'casillas.departamento  AS casilla_departamento',
                 'categorias.nombre AS categoria_nombre',
                 'casillas.seccione_id',
                 'casillas.estado AS casilla_estado',
@@ -185,7 +185,7 @@ class CasillaController extends Controller
             'casillas.id AS casilla_id',
             'casillas.nombre AS casilla_nombre',
             'casillas.observacion AS casilla_observacion',
-            'casillas.ubicacion AS casilla_ubicacion',
+            'casillas.departamento  AS casilla_departamento',
             'categorias.nombre AS categoria_nombre',
             'secciones.nombre AS seccion_nombre',
             'casillas.seccione_id',
