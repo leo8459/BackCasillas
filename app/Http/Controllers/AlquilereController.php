@@ -182,11 +182,11 @@ class AlquilereController extends Controller
         $casilla->save();
     }
 
-    $cliente = Cliente::find($request->cliente_id);
-    if ($cliente) {
-        // Envía un correo electrónico al cliente
-        Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-    }
+    // $cliente = Cliente::find($request->cliente_id);
+    // if ($cliente) {
+    //     // Envía un correo electrónico al cliente
+    //     Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
+    // }
 
     return response()->json(['message' => 'Alquiler actualizado correctamente', 'alquilere' => $alquilere]);
 }
