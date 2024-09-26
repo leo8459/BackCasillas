@@ -28,7 +28,7 @@ return new class extends Migration
             $table->foreignId('categoria_id')->nullable()->constrained('categorias');
             $table->foreignId('precio_id')->nullable()->constrained('precios');
             $table->foreignId('cajero_id')->nullable()->constrained('cajeros');
-            $table->foreignId('paquetes_id')->nullable()->constrained('paquetes');
+            $table->foreignId('paquete_id')->nullable()->constrained('paquetes');
             $table->integer('estado')->default(1);
             $table->timestamps();
         });

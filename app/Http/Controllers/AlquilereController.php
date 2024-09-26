@@ -25,7 +25,7 @@ class AlquilereController extends Controller
      */
     public function index()
     {
-        return Alquilere::with(['Casilla', 'Cliente','Categoria','Precio', 'Cajero', 'paquetes'])->get();
+        return Alquilere::with(['Casilla', 'Cliente','Categoria','Precio', 'Cajero', 'paquete'])->get();
         
         // return Alquilere::with(['Casilla', 'Cliente'])->where('estado',1)->get();
 
@@ -369,27 +369,24 @@ public function getCasillasByEstado($estado)
     
         if ($casilla) {
             // Busca el alquiler relacionado con la casilla
-            $alquiler = Alquilere::with(['paquetes']) // Incluye los paquetes asociados al alquiler
+            $alquiler = Alquilere::with(['paquete']) // Incluye el paquete asociado al alquiler
                                  ->where('casilla_id', $casilla->id)
                                  ->first();
     
-            if ($alquiler) {
-                // Obtiene solo los códigos de los paquetes asociados a ese alquiler
-                $paquetes = $alquiler->paquetes->pluck('codigo');
-    
+            if ($alquiler && $alquiler->paquete) {
+                // Retorna solo el código del paquete asociado a ese alquiler
                 return response()->json([
                     'success' => true,
                     'estado_casilla' => $alquiler->casilla->estado,
-                    'paquetes' => $paquetes,
+                    'paquete' => $alquiler->paquete->codigo, // Retorna solo un paquete
                 ]);
             } else {
-                return response()->json(['success' => false, 'message' => 'No se encontró un alquiler asociado a esta casilla.']);
+                return response()->json(['success' => false, 'message' => 'No se encontró un alquiler asociado a esta casilla o no tiene un paquete asociado.']);
             }
         }
     
         return response()->json(['success' => false, 'message' => 'No se encontró la casilla con ese nombre.']);
     }
-    
     
     
 

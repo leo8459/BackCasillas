@@ -26,7 +26,7 @@ class Alquilere extends Model
     public function llaves(){
         return $this->belongsTo(llaves::class);
     }
-    public function paquetes()
+    public function paquete()
     {
         return $this->belongsTo(Paquetes::class);
     }
