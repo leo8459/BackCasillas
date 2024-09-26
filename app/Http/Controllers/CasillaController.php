@@ -10,9 +10,52 @@ use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Confirmationagbcmail;
+use Illuminate\Support\Facades\File;
 
 class CasillaController extends Controller
 {
+
+
+    public function backupLaravel()
+    {
+        // Elimina el límite de tiempo de ejecución
+    set_time_limit(0);
+
+    
+        $zip = new \ZipArchive();
+        $backupFile = storage_path('app/backups/laravel_backup_' . date('Y-m-d_H-i-s') . '.zip');
+    
+        if ($zip->open($backupFile, \ZipArchive::CREATE) === TRUE) {
+            $this->addFolderToZip(base_path(), $zip);
+            $zip->close();
+            return response()->download($backupFile);
+        } else {
+            return response()->json(['error' => 'No se pudo generar el backup'], 500);
+        }
+    }
+    
+    private function addFolderToZip($folder, &$zip, $parentFolder = '')
+    {
+        $files = scandir($folder);
+    
+        foreach ($files as $file) {
+            if ($file == '.' || $file == '..') continue;
+    
+            $filePath = $folder . '/' . $file;
+            $relativePath = $parentFolder . $file;
+    
+            if (is_dir($filePath)) {
+                $zip->addEmptyDir($relativePath);
+                $this->addFolderToZip($filePath, $zip, $relativePath . '/');
+            } else {
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+    }
+    
+
+    
+    
     /**
      * Display a listing of the resource.
      *

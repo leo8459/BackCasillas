@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CasillaController;
 
+Route::apiResource('/alquileres','AlquilereController');  //editar agragar eliminar listar apiresource
 
 Route::group(['prefix'=>'api'],function(){
     Route::post('/login','UserController@login');//solo para logear
@@ -59,6 +60,7 @@ Route::group(['prefix'=>'cliente'],function(){
     Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
+    Route::apiResource('/paquetes','PaquetesController');  //editar agragar eliminar listar apiresource
 
 
 });
@@ -78,18 +80,28 @@ Route::group(['prefix'=>'cajero'],function(){
     Route::apiResource('/cajeros','CajeroController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/llaves','LlavesController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/reservas','ReservaController');  //editar agragar eliminar listar apiresource
+    Route::apiResource('/paquetes','PaquetesController');  //editar agragar eliminar listar apiresource
+
     Route::get('/todas-las-casillas','CasillaController@obtenerTodasLasCasillas');
 
     Route::post('/reservar-casillas', 'AlquilereController@reservarCasillas');
     Route::post('update-all-to-ocupadas', 'AlquilereController@updateAllToOcupadas');
     Route::post('update-casillas-seleccionadas','AlquilereController@updateCasillasSeleccionadas');
     Route::post('/login3','CajeroController@login3');//solo para logear
+
+
+    Route::get('/buscar-casilla/{nombre}', 'AlquilereController@buscarPorCasilla');
+
+
+
+
     Route::get('/ver3/{busquedaid}','CasillaController@busquedas');//solo para logear
 
     Route::get('/ver1/{seccionId}','CasillaController@obtenercasillas');//solo para logear
     Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
+    Route::post('/backup-laravel', 'CasillaController@backupLaravel');
 
 // En routes/web.php o routes/api.php
 Route::get('/ocupadas', 'AlquilereController@getCasillasOcupadas');

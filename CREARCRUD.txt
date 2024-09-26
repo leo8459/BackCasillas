@@ -1,4 +1,4 @@
 
-php artisan make:model Reserva -rm --api
+php artisan make:model Paquetes -rm --api
 
-php artisan migrate --path=/database/migrations/2024_07_08_123410_create_reservas_table.php
+php artisan migrate --path=/database/migrations/2023_11_10_065321_create_alquileres_table.php

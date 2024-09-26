@@ -16,6 +16,11 @@ return new class extends Migration
         Schema::create('alquileres', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->nullable();
+            $table->string('apertura')->nullable();
+            $table->string('estado_pago')->nullable();
+            $table->string('habilitacion')->nullable();
+
+
             $table->date('ini_fecha')->nullable();
             $table->date('fin_fecha')->nullable();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes');
@@ -23,6 +28,7 @@ return new class extends Migration
             $table->foreignId('categoria_id')->nullable()->constrained('categorias');
             $table->foreignId('precio_id')->nullable()->constrained('precios');
             $table->foreignId('cajero_id')->nullable()->constrained('cajeros');
+            $table->foreignId('paquetes_id')->nullable()->constrained('paquetes');
             $table->integer('estado')->default(1);
             $table->timestamps();
         });
