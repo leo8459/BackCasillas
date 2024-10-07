@@ -50,6 +50,7 @@ class AlquilereController extends Controller
          $alquilere->estado_pago = $request->estado_pago;//dinero
          $alquilere->ini_fecha = $request->ini_fecha;
          $alquilere->fin_fecha = $request->fin_fecha;
+         $alquilere->autorizado_recojo = $request->autorizado_recojo;
          $casilla = Casilla::find($request->casilla_id);
 
          
@@ -88,6 +89,7 @@ class AlquilereController extends Controller
          $alquilere->categoria = $alquilere->categoria;
          $alquilere->precio = $alquilere->precio;
          $alquilere->estado_pago = $alquilere->estado_pago;
+         $alquilere->autorizado_recojo = $alquilere->autorizado_recojo;
 
 
         $alquilere->url_pdf = url('web/reportes/alquileres/', $alquilere->id);
@@ -126,6 +128,7 @@ class AlquilereController extends Controller
         $alquilere->fin_fecha = $request->fin_fecha;
         $alquilere->estado_pago = $request->estado_pago;
         $alquilere->cajero_id = $request->cajero_id;
+        $alquilere->autorizado_recojo = $request->autorizado_recojo;
 
         // Cambiar el estado del alquiler original a 0 (terminado)
         $alquilere->estado = 0;
@@ -171,6 +174,7 @@ class AlquilereController extends Controller
     $alquilere->fin_fecha = $request->fin_fecha;
     $alquilere->estado_pago = $request->estado_pago;
     $alquilere->cajero_id = $request->cajero_id;
+    $alquilere->autorizado_recojo = $request->autorizado_recojo;
 
     // Guardar los cambios en el alquiler existente
     $alquilere->save();
