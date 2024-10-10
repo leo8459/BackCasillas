@@ -110,6 +110,7 @@ Route::get('/correspondencia', 'AlquilereController@getCasillasConCorrespondenci
 Route::get('/mantenimiento', 'AlquilereController@getCasillasMantenimiento');
 Route::get('/vencidas', 'AlquilereController@getCasillasVencidas');
 Route::get('/reservadas','AlquilereController@getCasillasReservadas');
+Route::put('alquileres/{codigo}/eliminar-paquete-id', 'AlquilereController@eliminarPaqueteId');
 
 
     Route::get('/dashboard','DashboardController@patito');//solo para logear

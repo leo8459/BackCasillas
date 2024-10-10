@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Alquilere extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'nombre', 'apertura', 'habilitacion', 'precio_id', 'cliente_id', 'casilla_id',
+        'categoria_id', 'cajero_id', 'estado_pago', 'ini_fecha', 'fin_fecha', 'paquete_id'
+    ];
     public function Cliente(){
         return $this->belongsTo(Cliente::class);
     }
@@ -28,6 +32,6 @@ class Alquilere extends Model
     }
     public function paquete()
     {
-        return $this->belongsTo(Paquetes::class);
+        return $this->belongsTo(Paquete::class);
     }
 }

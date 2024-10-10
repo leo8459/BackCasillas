@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Paquetes;
+use App\Models\Paquete;
 use Illuminate\Http\Request;
 use App\Models\Alquilere;
 
@@ -15,7 +15,7 @@ class PaquetesController extends Controller
      */
     public function index()
     {
-        return Paquetes::with(['Alquilere'])->get();
+        return Paquete::with(['Alquilere'])->get();
 
     }
 
@@ -27,7 +27,7 @@ class PaquetesController extends Controller
      */
     public function store(Request $request)
     {
-        $paquetes = new Paquetes();
+        $paquetes = new Paquete();
         $paquetes->codigo = $request->codigo;
         $paquetes->fecha = $request->fecha;
         $paquetes->alquilere_id = $request->alquilere_id;
@@ -42,10 +42,10 @@ class PaquetesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Paquetes  $paquetes
+     * @param  \App\Models\Paquete  $paquetes
      * @return \Illuminate\Http\Response
      */
-    public function show(Paquetes $paquetes)
+    public function show(Paquete $paquetes)
     {
         $paquetes->alquilere = $paquetes->alquilere;
 
@@ -56,10 +56,10 @@ class PaquetesController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Paquetes  $paquetes
+     * @param  \App\Models\Paquete  $paquetes
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Paquetes $paquetes)
+    public function update(Request $request, Paquete $paquetes)
     {
         $paquetes->codigo = $request->codigo;
         $paquetes->fecha = $request->fecha;
@@ -75,10 +75,10 @@ class PaquetesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Paquetes  $paquetes
+     * @param  \App\Models\Paquete  $paquetes
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Paquetes $paquetes)
+    public function destroy(Paquete $paquetes)
     {
         $paquetes->delete();
         return $paquetes;

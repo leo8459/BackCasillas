@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alquilere;
-use App\Models\Paquetes;
+use App\Models\Paquete;
 use App\Models\Casilla;
 use App\Models\Cliente;
 use App\Models\Categoria;
@@ -113,12 +113,15 @@ class AlquilereController extends Controller
      */
     public function update(Request $request, Alquilere $alquilere)
 {
+    
     // Verificar si la fecha final ha cambiado
     if ($request->fin_fecha != $alquilere->fin_fecha) {
         // Actualizar los datos del alquiler
         $alquilere->nombre = $request->nombre;
         $alquilere->cliente_id = $request->cliente_id;
         $alquilere->apertura = $request->apertura;
+        $alquilere->paquete_id = $request->paquete_id; // Asegúrate de que este valor no sea nulo
+
         $alquilere->habilitacion = $request->habilitacion;
         $alquilere->casilla_id = $request->casilla_id;
         $alquilere->categoria_id = $request->categoria_id;
@@ -137,6 +140,7 @@ class AlquilereController extends Controller
         $nuevoAlquilere->nombre = $request->nombre;
         $nuevoAlquilere->cliente_id = $request->cliente_id;
         $nuevoAlquilere->apertura = $request->apertura;
+        $nuevoAlquilere->paquete_id = $request->paquete_id;
         $nuevoAlquilere->habilitacion = $request->habilitacion;
         $nuevoAlquilere->casilla_id = $request->casilla_id;
         $nuevoAlquilere->categoria_id = $request->categoria_id;
@@ -165,7 +169,8 @@ class AlquilereController extends Controller
     $alquilere->apertura = $request->apertura;
     $alquilere->habilitacion = $request->habilitacion;
     $alquilere->cliente_id = $request->cliente_id;
-    $alquilere->paquetes_id = $request->paquetes_id;
+    $alquilere->paquete_id = $request->paquete_id; // Asegúrate de que este valor no sea nulo
+
     $alquilere->casilla_id = $request->casilla_id;
     $alquilere->categoria_id = $request->categoria_id;
     $alquilere->precio_id = $request->precio_id;
@@ -390,6 +395,43 @@ public function getCasillasByEstado($estado)
     
     
 
+    public function eliminarPaqueteId($codigo)
+    {
+        try {
+            \Log::info("Iniciando eliminación de paquete_id para paquete con código: {$codigo}");
     
+            // Buscar el paquete por su código
+            $paquete = Paquete::where('codigo', $codigo)->firstOrFail();
+    
+            \Log::info("Paquete encontrado: ID {$paquete->id}");
+    
+            // Buscar el alquiler que tiene este paquete_id
+            $alquilere = Alquilere::where('paquete_id', $paquete->id)->firstOrFail();
+    
+            \Log::info("Alquiler encontrado: ID {$alquilere->id}");
+    
+            // Establecer paquete_id a null en el alquiler
+            $alquilere->paquete_id = null;
+    
+            // Guardar los cambios
+            $alquilere->save();
+    
+            \Log::info("paquete_id eliminado correctamente en el alquiler ID {$alquilere->id}");
+    
+            return response()->json(['message' => 'paquete_id eliminado correctamente.'], 200);
+        } catch (\Exception $e) {
+            \Log::error("Error al eliminar paquete_id: " . $e->getMessage());
+            return response()->json([
+                'error' => 'Error al eliminar paquete_id.',
+                'exception' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+
+    
+    
+
+
     
 }

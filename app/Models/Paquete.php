@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Paquetes extends Model
+class Paquete extends Model
 {
     use HasFactory;
     public function alquilere()
