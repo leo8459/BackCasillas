@@ -112,17 +112,79 @@ class AlquilereController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Alquilere $alquilere)
-{
+    {
+        // Verificar si el paquete_id ha cambiado
+        if ($request->paquete_id != $alquilere->paquete_id) {
+            // Actualizar el campo paquete_id
+            $alquilere->paquete_id = $request->paquete_id;
+            $alquilere->save();
     
-    // Verificar si la fecha final ha cambiado
-    if ($request->fin_fecha != $alquilere->fin_fecha) {
-        // Actualizar los datos del alquiler
+            // Enviar el correo electrónico al cliente
+            $cliente = $alquilere->cliente;
+            if ($cliente) {
+                Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
+            }
+    
+            return response()->json(['message' => 'paquete_id actualizado y correo enviado correctamente.']);
+        }
+    
+        // Si la fecha final ha cambiado
+        if ($request->fin_fecha != $alquilere->fin_fecha) {
+            // Actualizar los datos del alquiler
+            $alquilere->nombre = $request->nombre;
+            $alquilere->cliente_id = $request->cliente_id;
+            $alquilere->apertura = $request->apertura;
+            $alquilere->paquete_id = $request->paquete_id; // Asegúrate de que este valor no sea nulo
+    
+            $alquilere->habilitacion = $request->habilitacion;
+            $alquilere->casilla_id = $request->casilla_id;
+            $alquilere->categoria_id = $request->categoria_id;
+            $alquilere->precio_id = $request->precio_id;
+            $alquilere->ini_fecha = $request->ini_fecha;
+            $alquilere->fin_fecha = $request->fin_fecha;
+            $alquilere->estado_pago = $request->estado_pago;
+            $alquilere->cajero_id = $request->cajero_id;
+    
+            // Cambiar el estado del alquiler original a 0 (terminado)
+            $alquilere->estado = 0;
+            $alquilere->save();
+    
+            // Crear un nuevo alquiler con los datos actualizados y estado 1 (activo)
+            $nuevoAlquilere = new Alquilere();
+            $nuevoAlquilere->nombre = $request->nombre;
+            $nuevoAlquilere->cliente_id = $request->cliente_id;
+            $nuevoAlquilere->apertura = $request->apertura;
+            $nuevoAlquilere->paquete_id = $request->paquete_id;
+            $nuevoAlquilere->habilitacion = $request->habilitacion;
+            $nuevoAlquilere->casilla_id = $request->casilla_id;
+            $nuevoAlquilere->categoria_id = $request->categoria_id;
+            $nuevoAlquilere->precio_id = $request->precio_id;
+            $nuevoAlquilere->ini_fecha = $request->ini_fecha;
+            $nuevoAlquilere->fin_fecha = $request->fin_fecha;
+            $nuevoAlquilere->estado_pago = $request->estado_pago;
+            $nuevoAlquilere->cajero_id = $request->cajero_id;
+    
+            // Establecer el estado en 1 (activo)
+            $nuevoAlquilere->estado = 1;
+            $nuevoAlquilere->save();
+    
+            // Actualizar el estado de la casilla si es necesario
+            $casilla = Casilla::find($alquilere->casilla_id);
+            if ($casilla) {
+                $casilla->estado = $request->casilla_estado ?? 0; // Si 'casilla_estado' no está definido, asigna un valor predeterminado
+                $casilla->save();
+            }
+    
+            return response()->json(['message' => 'Alquiler actualizado correctamente y nuevo alquiler creado', 'alquilere' => $nuevoAlquilere]);
+        }
+    
+        // Si la fecha final no ha cambiado, actualizar el alquiler existente con todos los datos del request
         $alquilere->nombre = $request->nombre;
-        $alquilere->cliente_id = $request->cliente_id;
         $alquilere->apertura = $request->apertura;
-        $alquilere->paquete_id = $request->paquete_id; // Asegúrate de que este valor no sea nulo
-
         $alquilere->habilitacion = $request->habilitacion;
+        $alquilere->cliente_id = $request->cliente_id;
+        $alquilere->paquete_id = $request->paquete_id; // Asegúrate de que este valor no sea nulo
+    
         $alquilere->casilla_id = $request->casilla_id;
         $alquilere->categoria_id = $request->categoria_id;
         $alquilere->precio_id = $request->precio_id;
@@ -130,73 +192,20 @@ class AlquilereController extends Controller
         $alquilere->fin_fecha = $request->fin_fecha;
         $alquilere->estado_pago = $request->estado_pago;
         $alquilere->cajero_id = $request->cajero_id;
-
-        // Cambiar el estado del alquiler original a 0 (terminado)
-        $alquilere->estado = 0;
+    
+        // Guardar los cambios en el alquiler existente
         $alquilere->save();
-
-        // Crear un nuevo alquiler con los datos actualizados y estado 1 (activo)
-        $nuevoAlquilere = new Alquilere();
-        $nuevoAlquilere->nombre = $request->nombre;
-        $nuevoAlquilere->cliente_id = $request->cliente_id;
-        $nuevoAlquilere->apertura = $request->apertura;
-        $nuevoAlquilere->paquete_id = $request->paquete_id;
-        $nuevoAlquilere->habilitacion = $request->habilitacion;
-        $nuevoAlquilere->casilla_id = $request->casilla_id;
-        $nuevoAlquilere->categoria_id = $request->categoria_id;
-        $nuevoAlquilere->precio_id = $request->precio_id;
-        $nuevoAlquilere->ini_fecha = $request->ini_fecha;
-        $nuevoAlquilere->fin_fecha = $request->fin_fecha;
-        $nuevoAlquilere->estado_pago = $request->estado_pago;
-        $nuevoAlquilere->cajero_id = $request->cajero_id;
-
-        // Establecer el estado en 1 (activo)
-        $nuevoAlquilere->estado = 1;
-        $nuevoAlquilere->save();
-
-        // Actualizar el estado de la casilla si es necesario
+    
+        // Actualizar el estado de la casilla
         $casilla = Casilla::find($alquilere->casilla_id);
         if ($casilla) {
-            $casilla->estado = $request->casilla_estado ?? 0; // Si 'casilla_estado' no está definido, asigna un valor predeterminado
+            $casilla->estado = $request->casilla_estado;
             $casilla->save();
         }
-
-        return response()->json(['message' => 'Alquiler actualizado correctamente y nuevo alquiler creado', 'alquilere' => $nuevoAlquilere]);
+    
+        return response()->json(['message' => 'Alquiler actualizado correctamente', 'alquilere' => $alquilere]);
     }
-
-    // Si la fecha final no ha cambiado, actualizar el alquiler existente con todos los datos del request
-    $alquilere->nombre = $request->nombre;
-    $alquilere->apertura = $request->apertura;
-    $alquilere->habilitacion = $request->habilitacion;
-    $alquilere->cliente_id = $request->cliente_id;
-    $alquilere->paquete_id = $request->paquete_id; // Asegúrate de que este valor no sea nulo
-
-    $alquilere->casilla_id = $request->casilla_id;
-    $alquilere->categoria_id = $request->categoria_id;
-    $alquilere->precio_id = $request->precio_id;
-    $alquilere->ini_fecha = $request->ini_fecha;
-    $alquilere->fin_fecha = $request->fin_fecha;
-    $alquilere->estado_pago = $request->estado_pago;
-    $alquilere->cajero_id = $request->cajero_id;
-
-    // Guardar los cambios en el alquiler existente
-    $alquilere->save();
-
-    // Actualizar el estado de la casilla
-    $casilla = Casilla::find($alquilere->casilla_id);
-    if ($casilla) {
-        $casilla->estado = $request->casilla_estado;
-        $casilla->save();
-    }
-
-    // $cliente = Cliente::find($request->cliente_id);
-    // if ($cliente) {
-    //     // Envía un correo electrónico al cliente
-    //     Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-    // }
-
-    return response()->json(['message' => 'Alquiler actualizado correctamente', 'alquilere' => $alquilere]);
-}
+    
 
 
 
@@ -398,17 +407,14 @@ public function getCasillasByEstado($estado)
     public function eliminarPaqueteId($codigo)
     {
         try {
-            \Log::info("Iniciando eliminación de paquete_id para paquete con código: {$codigo}");
     
             // Buscar el paquete por su código
             $paquete = Paquete::where('codigo', $codigo)->firstOrFail();
     
-            \Log::info("Paquete encontrado: ID {$paquete->id}");
     
             // Buscar el alquiler que tiene este paquete_id
             $alquilere = Alquilere::where('paquete_id', $paquete->id)->firstOrFail();
     
-            \Log::info("Alquiler encontrado: ID {$alquilere->id}");
     
             // Establecer paquete_id a null en el alquiler
             $alquilere->paquete_id = null;
@@ -416,11 +422,9 @@ public function getCasillasByEstado($estado)
             // Guardar los cambios
             $alquilere->save();
     
-            \Log::info("paquete_id eliminado correctamente en el alquiler ID {$alquilere->id}");
     
             return response()->json(['message' => 'paquete_id eliminado correctamente.'], 200);
         } catch (\Exception $e) {
-            \Log::error("Error al eliminar paquete_id: " . $e->getMessage());
             return response()->json([
                 'error' => 'Error al eliminar paquete_id.',
                 'exception' => $e->getMessage()
