@@ -15,7 +15,7 @@ class Casilla extends Model
         return $this->belongsTo(Seccione::class);
     }
     public function llaves(){
-        return $this->belongsTo(llaves::class);
+        return $this->belongsTo(Llave::class, 'llaves_id');
     }
     public function Cliente(){
         return $this->belongsTo(Cliente::class);
