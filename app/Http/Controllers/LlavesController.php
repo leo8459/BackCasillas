@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\llaves;
+use App\Models\Llave; // Asegúrate de importar correctamente el modelo
 use Illuminate\Http\Request;
 
 class LlavesController extends Controller
@@ -14,7 +14,7 @@ class LlavesController extends Controller
      */
     public function index()
     {
-        return llaves::all();
+        return Llave::all();
 
     }
 
@@ -26,7 +26,7 @@ class LlavesController extends Controller
      */
     public function store(Request $request)
     {
-        $llaves = new llaves();
+        $llaves = new Llave();
         $llaves->nombre = $request->nombre;
 
         $llaves->save();
@@ -40,7 +40,7 @@ class LlavesController extends Controller
      * @param  \App\Models\llaves  $llaves
      * @return \Illuminate\Http\Response
      */
-    public function show(llaves $llaves)
+    public function show(Llave $llaves)
     {
         return $llaves;
 
@@ -53,7 +53,7 @@ class LlavesController extends Controller
      * @param  \App\Models\llaves  $llaves
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, llaves $llaves)
+    public function update(Request $request, Llave $llaves)
     {
         $llaves->nombre = $request->nombre;
 
@@ -69,7 +69,7 @@ class LlavesController extends Controller
      * @param  \App\Models\llaves  $llaves
      * @return \Illuminate\Http\Response
      */
-    public function destroy(llaves $llaves)
+    public function destroy(Llave $llaves)
     {
         $llaves->delete();
         return $llaves;

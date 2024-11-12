@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Casilla;
 use App\Models\Categoria;
 use App\Models\Seccione;
-use App\Models\llaves;
+use App\Models\Llave;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -54,14 +54,14 @@ class CasillaController extends Controller
      * @param  \App\Models\Casilla  $casilla
      * @return \Illuminate\Http\Response
      */
-    public function show(Casilla $casilla)
-    {
-        $casilla->categoria = $casilla->Categoria;
-        $casilla->seccione = $casilla->Seccione;
-
-        return $casilla;
-
+    public function show($id)
+{
+    try {
+        return Casilla::with(['Categoria', 'Seccione', 'llaves'])->findOrFail($id);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al recuperar datos de casilla', 'details' => $e->getMessage()], 500);
     }
+}
 
     /**
      * Update the specified resource in storage.
