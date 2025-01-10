@@ -117,18 +117,7 @@ class AlquilereController extends Controller
     // Verificar si la fecha final ha cambiado
     if ($request->fin_fecha != $alquilere->fin_fecha) {
         // Actualizar los datos del alquiler
-        $alquilere->nombre = $request->nombre;
-        $alquilere->cliente_id = $request->cliente_id;
-        $alquilere->apertura = $request->apertura;
-        $alquilere->habilitacion = $request->habilitacion;
-        $alquilere->casilla_id = $request->casilla_id;
-        $alquilere->categoria_id = $request->categoria_id;
-        $alquilere->precio_id = $request->precio_id;
-        $alquilere->ini_fecha = $request->ini_fecha;
-        $alquilere->fin_fecha = $request->fin_fecha;
-        $alquilere->estado_pago = $request->estado_pago;
-        $alquilere->cajero_id = $request->cajero_id;
-        $alquilere->autorizado_recojo = $request->autorizado_recojo;
+       
 
         // Cambiar el estado del alquiler original a 0 (terminado)
         $alquilere->estado = 0;
