@@ -6,7 +6,6 @@ use App\Http\Controllers\CasillaController;
 
 Route::group(['prefix'=>'api'],function(){
     Route::post('/login','UserController@login');//solo para logear
-    // Route::post('/login2','ClienteController@login2');//solo para logear
     Route::get('/ver1/{seccionId}','CasillaController@obtenercasillas');//solo para logear
     Route::get('/ver2/{seccionId}', 'CasillaController@obtenerInformacionAlquileres');
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
@@ -29,7 +28,6 @@ Route::group(['prefix'=>'api'],function(){
     Route::get('/fecha/{alquilerId}', 'AlquilereController@verificarFechaPorVencer');
     Route::get('/reportes/alquileres/{alquilere}', 'AlquilereController@pdf');
 
-    // Route::get('/ver1/{seccionId}', [CasillaController::class, 'obtenercasillas']);
 
     Route::apiResource('/users','UserController');
     Route::apiResource('/categorias','CategoriaController');  //editar agragar eliminar listar apiresource
@@ -39,10 +37,6 @@ Route::group(['prefix'=>'api'],function(){
     Route::apiResource('/alquileres','AlquilereController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/precios','PrecioController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/cajeros','CajeroController');  //editar agragar eliminar listar apiresource
-
-
-
-
 });
 
 
