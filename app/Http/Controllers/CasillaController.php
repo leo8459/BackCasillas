@@ -18,40 +18,91 @@ class CasillaController extends Controller
 
     public function backupLaravel()
     {
-        // Elimina el límite de tiempo de ejecución
-    set_time_limit(0);
-
+        // Para evitar que el proceso muera si tarda
+        set_time_limit(0);
     
+        // 1) Generar el dump de la base de datos
+        //    Obteniendo credenciales de .env (usa config('database.connections.mysql.*') si prefieres)
+        $dbHost = env('DB_HOST', '127.0.0.1');
+        $dbUser = env('DB_USERNAME', 'root');
+        $dbPass = env('DB_PASSWORD', '');
+        $dbName = env('DB_DATABASE', 'casillasagbc20231');
+    
+        // Ruta donde guardaremos temporalmente el dump
+        $dumpPath = storage_path('app/backups/db_backup_' . date('Y-m-d_H-i-s') . '.sql');
+    
+        // Importante: en Windows puede que debas ajustar la ruta a "mysqldump.exe"
+        // y en Linux usar "mysqldump" a secas. Ejemplo:
+        // $mysqldumpBinary = 'C:\xampp\mysql\bin\mysqldump'; // Windows
+        // $mysqldumpBinary = '/usr/bin/mysqldump'; // Linux
+        // O, si está en PATH, con "mysqldump" basta:
+        $mysqldumpBinary = 'C:\\XAMPP\\mysql\\bin\\mysqldump.exe';
+    
+        // Ejecutamos el comando. Verifica que no tengas problemas con `exec` deshabilitado.
+        $command = "\"{$mysqldumpBinary}\" --host=\"{$dbHost}\" --user=\"{$dbUser}\" --password=\"{$dbPass}\" \"{$dbName}\" > \"{$dumpPath}\"";
+        exec($command);
+    
+        // 2) Crear el archivo ZIP que contendrá el proyecto + el dump
         $zip = new \ZipArchive();
         $backupFile = storage_path('app/backups/laravel_backup_' . date('Y-m-d_H-i-s') . '.zip');
     
         if ($zip->open($backupFile, \ZipArchive::CREATE) === TRUE) {
+    
+            // 2.a) Agregamos la carpeta base de Laravel al .zip
             $this->addFolderToZip(base_path(), $zip);
+    
+            // 2.b) Agregamos el dump .sql al .zip con un nombre "database_backup.sql"
+            //      (Podrías guardarlo con el nombre $dumpPath si prefieres).
+            $zip->addFile($dumpPath, 'database_backup.sql');
+    
+            // Cerrar el ZIP
             $zip->close();
-            return response()->download($backupFile);
+    
+            // 3) (Opcional) Borrar el archivo .sql temporal
+            if (file_exists($dumpPath)) {
+                unlink($dumpPath);
+            }
+    
+            // Retornar la descarga al usuario
+            return response()->download($backupFile)->deleteFileAfterSend(false);
+    
         } else {
+            // Si no se pudo crear el ZIP
+            // (Opcional) Borramos el dump si existe
+            if (file_exists($dumpPath)) {
+                unlink($dumpPath);
+            }
             return response()->json(['error' => 'No se pudo generar el backup'], 500);
         }
     }
     
+    /**
+     * Recursivamente agrega carpetas al ZIP.
+     */
     private function addFolderToZip($folder, &$zip, $parentFolder = '')
     {
         $files = scandir($folder);
     
         foreach ($files as $file) {
-            if ($file == '.' || $file == '..') continue;
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
     
             $filePath = $folder . '/' . $file;
             $relativePath = $parentFolder . $file;
     
             if (is_dir($filePath)) {
+                // Crear carpeta dentro del ZIP
                 $zip->addEmptyDir($relativePath);
+                // Recursión
                 $this->addFolderToZip($filePath, $zip, $relativePath . '/');
             } else {
+                // Agregar archivo al ZIP
                 $zip->addFile($filePath, $relativePath);
             }
         }
     }
+    
     
 
     
