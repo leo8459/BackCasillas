@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('codigo')->nullable();
             $table->string('departamento')->nullable();
             $table->date('fecha')->nullable();
+            $table->foreignId('alquiler_id')->nullable()->constrained('alquileres');
             $table->timestamps();
         });
     }
