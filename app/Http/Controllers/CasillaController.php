@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Casilla;
 use App\Models\Categoria;
 use App\Models\Seccione;
-use App\Models\llaves;
+use App\Models\Llave;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -114,7 +114,7 @@ class CasillaController extends Controller
      */
     public function index()
     {
-        return Casilla::with(['Categoria', 'Seccione'])->get();
+        return Casilla::with(['Categoria', 'Seccione','llaves'])->get();
 
         // return Casilla::with(['Categoria', 'Seccione'])->where('estado',1)->get();
 
@@ -148,14 +148,14 @@ class CasillaController extends Controller
      * @param  \App\Models\Casilla  $casilla
      * @return \Illuminate\Http\Response
      */
-    public function show(Casilla $casilla)
-    {
-        $casilla->categoria = $casilla->Categoria;
-        $casilla->seccione = $casilla->Seccione;
-
-        return $casilla;
-
+    public function show($id)
+{
+    try {
+        return Casilla::with(['Categoria', 'Seccione', 'llaves'])->findOrFail($id);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al recuperar datos de casilla', 'details' => $e->getMessage()], 500);
     }
+}
 
     /**
      * Update the specified resource in storage.
@@ -210,15 +210,20 @@ class CasillaController extends Controller
             })
             ->leftJoin('clientes', 'alquileres.cliente_id', '=', 'clientes.id')
             ->leftJoin('categorias', 'casillas.categoria_id', '=', 'categorias.id')
+            ->leftJoin('llaves', 'casillas.llaves_id', '=', 'llaves.id') // Asegurar que se unan las llaves
             ->where('casillas.seccione_id', $seccionId)
             ->select(
                 'casillas.id AS casilla_id',
                 'casillas.nombre AS casilla_nombre',
                 'casillas.observacion AS casilla_observacion',
-                'casillas.departamento  AS casilla_departamento',
+                'casillas.departamento AS casilla_departamento',
                 'categorias.nombre AS categoria_nombre',
                 'casillas.seccione_id',
                 'casillas.llaves_id',
+                'llaves.id AS llave_id', // ID de la llave
+                'llaves.nombre AS llave_nombre', // Nombre de la llave
+                'llaves.created_at AS llave_creado', // Fecha de creación de la llave
+                'llaves.updated_at AS llave_actualizado', // Fecha de actualización de la llave
                 'casillas.estado AS casilla_estado',
                 'alquileres.id AS alquiler_id',
                 'alquileres.nombre AS alquiler_nombre',
@@ -229,12 +234,15 @@ class CasillaController extends Controller
             )
             ->get();
     
-        $response = [
-            'casillas' => $casillas,
-        ];
+        // Revisar si la consulta devuelve correctamente los datos de la llave
+        if ($casillas->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron casillas'], 404);
+        }
     
-        return $response;
+        return response()->json(['casillas' => $casillas]);
     }
+    
+    
     public function busquedas ($busquedaid) {
         $casillas = Casilla::leftJoin('alquileres', function ($join) {
                 $join->on('casillas.id', '=', 'alquileres.casilla_id')
@@ -267,37 +275,41 @@ class CasillaController extends Controller
         return $response;
     }
     public function obtenerTodasLasCasillas()
-{
-    $casillas = Casilla::leftJoin('alquileres', function ($join) {
-            $join->on('casillas.id', '=', 'alquileres.casilla_id')
-                ->where('alquileres.estado', '=', 1);
-        })
-        ->leftJoin('clientes', 'alquileres.cliente_id', '=', 'clientes.id')
-        ->leftJoin('categorias', 'casillas.categoria_id', '=', 'categorias.id')
-        ->leftJoin('secciones', 'casillas.seccione_id', '=', 'secciones.id')
-        ->select(
-            'casillas.id AS casilla_id',
-            'casillas.nombre AS casilla_nombre',
-            'casillas.observacion AS casilla_observacion',
-            'casillas.departamento  AS casilla_departamento',
-            'categorias.nombre AS categoria_nombre',
-            'secciones.nombre AS seccion_nombre',
-            'casillas.seccione_id',
-            'casillas.llaves_id',
-            'casillas.estado AS casilla_estado',
-            'alquileres.id AS alquiler_id',
-            'alquileres.nombre AS alquiler_nombre',
-            'alquileres.cliente_id',
-            'alquileres.estado AS alquiler_estado',
-            'clientes.nombre AS cliente_nombre',
-            'clientes.carnet'
-        )
-        ->get();
-
-    return response()->json([
-        'casillas' => $casillas,
-    ]);
-}
+    {
+        $casillas = Casilla::leftJoin('alquileres', function ($join) {
+                $join->on('casillas.id', '=', 'alquileres.casilla_id')
+                    ->where('alquileres.estado', '=', 1);
+            })
+            ->leftJoin('clientes', 'alquileres.cliente_id', '=', 'clientes.id')
+            ->leftJoin('categorias', 'casillas.categoria_id', '=', 'categorias.id')
+            ->leftJoin('secciones', 'casillas.seccione_id', '=', 'secciones.id')
+            ->leftJoin('llaves', 'casillas.llaves_id', '=', 'llaves.id') // Unimos la tabla de llaves
+            ->select(
+                'casillas.id AS casilla_id',
+                'casillas.nombre AS casilla_nombre',
+                'casillas.observacion AS casilla_observacion',
+                'casillas.departamento AS casilla_departamento',
+                'categorias.nombre AS categoria_nombre',
+                'secciones.nombre AS seccion_nombre',
+                'casillas.seccione_id',
+                'casillas.llaves_id',
+                'llaves.nombre AS llave_nombre', // Añadimos el nombre de la llave
+                'llaves.id AS llave_id', // Añadimos el ID de la llave
+                'casillas.estado AS casilla_estado',
+                'alquileres.id AS alquiler_id',
+                'alquileres.nombre AS alquiler_nombre',
+                'alquileres.cliente_id',
+                'alquileres.estado AS alquiler_estado',
+                'clientes.nombre AS cliente_nombre',
+                'clientes.carnet'
+            )
+            ->get();
+    
+        return response()->json([
+            'casillas' => $casillas,
+        ]);
+    }
+    
 
    
     

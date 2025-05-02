@@ -25,15 +25,19 @@ class ReservaCasillaNotification extends Notification
     }
 
     public function toMail($notifiable)
-    {
-        return (new MailMessage)
-                    ->subject('Reserva de Casilla')
-                    ->greeting('¡Hola ' . $this->reserva->nombre . '!')
-                    ->line('Has reservado la casilla número ' . $this->casilla->id . '.')
-                    ->line('Tienes 3 días para pasar por la Agencia Boliviana de Correos (AGBC) y cancelar la reserva. Después de este plazo, tu reserva será cancelada automáticamente.')
-                    ->line('Dirección de la agencia: Avenida Mariscal Santa Cruz Esquina Calle Oruro Edificio Telecomunicaciones')
-                    ->line('Gracias por utilizar nuestros servicios.');
-    }
+{
+    $whatsappUrl = 'https://wa.me/59175200503'; // Enlace de WhatsApp con el número en formato internacional
+    
+    return (new MailMessage)
+                ->subject('Reserva de Casilla')
+                ->greeting('¡Hola ' . $this->reserva->nombre . '!')
+                ->line('Has reservado la casilla número ' . $this->casilla->id . '.')
+                ->line('Tienes 3 días para pasar por la Agencia Boliviana de Correos (AGBC) y cancelar la reserva o comuniquese con este número para hacer el pago de su reserva.')
+                ->action('Contactar por WhatsApp', $whatsappUrl) // Agrega un botón para WhatsApp
+                ->line('Dirección de la agencia: Avenida Mariscal Santa Cruz Esquina Calle Oruro Edificio Telecomunicaciones')
+                ->line('Gracias por utilizar nuestros servicios.');
+}
+
 
     public function toArray($notifiable)
     {

@@ -15,18 +15,22 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
 {
-    // $schedule->command('emails:send')->dailyAt('7:00');
-    // $schedule->command('emails:send2')->dailyAt('7:00');
-    // $schedule->command('emails:send3')->dailyAt('7:00');
-    // $schedule->command('alquileres:updateVencidos')->dailyAt('7:00');
-    // $schedule->command('alquileres:updateAllToOcupadas')->dailyAt('7:00');
-    // $schedule->command('reservas:update-estado')->dailyAt('7:00');
-    $schedule->command('emails:send')->everyMinute();
-    $schedule->command('emails:send2')->everyMinute();
-    $schedule->command('emails:send3')->everyMinute();
-    $schedule->command('alquileres:updateVencidos')->everyMinute();
-    $schedule->command('alquileres:updateAllToOcupadas')->everyMinute();
-    $schedule->command('reservas:update-estado')->everyMinute();
+    $schedule->command('emails:send')->dailyAt('7:00');
+    $schedule->command('emails:send2')->dailyAt('7:00');
+    $schedule->command('emails:send3')->dailyAt('7:00');
+    $schedule->command('alquileres:updateVencidos')->dailyAt('7:00');
+    $schedule->command('alquileres:updateAllToOcupadas')->dailyAt('7:00');
+    $schedule->command('reservas:update-estado')->dailyAt('7:00');
+    $schedule->command('casillas:actualizar-estado')->dailyAt('7:00');
+
+    // $schedule->command('emails:send')->everyMinute();
+    // $schedule->command('emails:send2')->everyMinute();
+    // $schedule->command('emails:send3')->everyMinute();
+    // $schedule->command('alquileres:updateVencidos')->everyMinute();
+    // $schedule->command('alquileres:updateAllToOcupadas')->everyMinute();
+    // $schedule->command('reservas:update-estado')->everyMinute();
+    // $schedule->command('casillas:actualizar-estado')->everyMinute();
+
     
 }
 

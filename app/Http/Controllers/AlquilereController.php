@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\Confirmationagbcmail;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AlquilereController extends Controller
 {
@@ -25,8 +26,8 @@ class AlquilereController extends Controller
      */
     public function index()
     {
-        return Alquilere::with(['Casilla', 'Cliente','Categoria','Precio', 'Cajero', 'paquete'])->get();
-        
+        return Alquilere::with(['Casilla', 'Cliente', 'Categoria', 'Precio', 'Cajero'])->get();
+
         // return Alquilere::with(['Casilla', 'Cliente'])->where('estado',1)->get();
 
     }
@@ -40,27 +41,28 @@ class AlquilereController extends Controller
     public function store(Request $request)
     {
         $alquilere = new Alquilere();
-         $alquilere->nombre = $request->nombre;//dinero
-         $alquilere->apertura = $request->apertura;
-         $alquilere->habilitacion = $request->habilitacion;//dinero
-         $alquilere->precio_id = $request->precio_id;//dinero
-         $alquilere->cliente_id = $request->cliente_id;
-         $alquilere->casilla_id = $request->casilla_id;
-         $alquilere->categoria_id = $request->categoria_id;
-         $alquilere->cajero_id = $request->cajero_id; // Asegúrate de que cajero_id esté llegando correctamente en la solicitud
-         $alquilere->estado_pago = $request->estado_pago;//dinero
-         $alquilere->ini_fecha = $request->ini_fecha;
-         $alquilere->fin_fecha = $request->fin_fecha;
-         $casilla = Casilla::find($request->casilla_id);
-
-         
-         if ($casilla) {
-             $casilla->estado = 0;
-             $casilla->save();
-         }
+        $alquilere->nombre = $request->nombre; //dinero
+        $alquilere->apertura = $request->apertura;
+        $alquilere->habilitacion = $request->habilitacion; //dinero
+        $alquilere->precio_id = $request->precio_id; //dinero
+        $alquilere->cliente_id = $request->cliente_id;
+        $alquilere->casilla_id = $request->casilla_id;
+        $alquilere->categoria_id = $request->categoria_id;
+        $alquilere->cajero_id = $request->cajero_id; // Asegúrate de que cajero_id esté llegando correctamente en la solicitud
+        $alquilere->estado_pago = $request->estado_pago; //dinero
+        $alquilere->ini_fecha = $request->ini_fecha;
+        $alquilere->fin_fecha = $request->fin_fecha;
+        $alquilere->autorizado_recojo = $request->autorizado_recojo;
+        $casilla = Casilla::find($request->casilla_id);
 
 
-         $alquilere->save();
+        if ($casilla) {
+            $casilla->estado = 0;
+            $casilla->save();
+        }
+
+
+        $alquilere->save();
         //  $cliente = Cliente::find($request->cliente_id);
 
         //  if ($cliente) {
@@ -70,8 +72,7 @@ class AlquilereController extends Controller
         //     // Manejar caso en el que no se encuentra el cliente
         //     // Puedes agregar el código para manejar este caso según tus necesidades
         // }
-         return $alquilere;
-
+        return $alquilere;
     }
 
     /**
@@ -84,24 +85,25 @@ class AlquilereController extends Controller
     {
         $alquilere->cliente = $alquilere->cliente;
         $alquilere->apertura = $alquilere->apertura;
-         $alquilere->habilitacion = $alquilere->habilitacion;
-         $alquilere->casilla = $alquilere->casilla;
-         $alquilere->categoria = $alquilere->categoria;
-         $alquilere->precio = $alquilere->precio;
-         $alquilere->estado_pago = $alquilere->estado_pago;
+        $alquilere->habilitacion = $alquilere->habilitacion;
+        $alquilere->casilla = $alquilere->casilla;
+        $alquilere->categoria = $alquilere->categoria;
+        $alquilere->precio = $alquilere->precio;
+        $alquilere->estado_pago = $alquilere->estado_pago;
+        $alquilere->autorizado_recojo = $alquilere->autorizado_recojo;
 
 
         $alquilere->url_pdf = url('web/reportes/alquileres/', $alquilere->id);
         return $alquilere;
     }
     public function pdf(Alquilere $alquilere)
-{
-    $alquilere = $this->show($alquilere);
-    $alquilere->url_pdf = url('api/reportes/alquileres/', $alquilere->id);
+    {
+        $alquilere = $this->show($alquilere);
+        $alquilere->url_pdf = url('api/reportes/alquileres/', $alquilere->id);
 
-    $pdf = PDF::loadView('reports.alquilere', ["alquilere" => $alquilere]);
-    return $pdf->stream();
-}
+        $pdf = PDF::loadView('reports.alquilere', ["alquilere" => $alquilere]);
+        return $pdf->stream();
+    }
 
 
     /**
@@ -112,109 +114,73 @@ class AlquilereController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Alquilere $alquilere)
-    {
-        // Verificar si el paquete_id ha cambiado
-        if ($request->paquete_id != $alquilere->paquete_id) {
-            $alquilere->paquete_id = $request->paquete_id;
-            $alquilere->save();
-    
-            // Enviar correo al cliente
-            $cliente = $alquilere->cliente ?? Cliente::find($alquilere->cliente_id);
-            if ($cliente) {
-                Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-            }
-    
-            return response()->json(['message' => 'paquete_id actualizado y correo enviado correctamente.']);
-        }
-    
-        // Si la fecha final ha cambiado, crear nuevo alquiler
-        if ($request->fin_fecha != $alquilere->fin_fecha) {
-            $alquilere->nombre = $request->nombre;
-            $alquilere->cliente_id = $request->cliente_id;
-            $alquilere->apertura = $request->apertura;
-            $alquilere->paquete_id = $request->paquete_id;
-            $alquilere->habilitacion = $request->habilitacion;
-            $alquilere->casilla_id = $request->casilla_id;
-            $alquilere->categoria_id = $request->categoria_id;
-            $alquilere->precio_id = $request->precio_id;
-            $alquilere->ini_fecha = $request->ini_fecha;
-            $alquilere->fin_fecha = $request->fin_fecha;
-            $alquilere->estado_pago = $request->estado_pago;
+{
+    /*-----------------------------------------------------------
+      Asegurarse de que siempre llegue un cajero_id:
+      1) si viene en la petición: lo dejamos
+      2) si no viene, tomamos el del usuario autenticado
+    -----------------------------------------------------------*/
+    $request->merge([
+        'cajero_id' => $request->cajero_id ?? (Auth::user()->cajero->id ?? null)
+    ]);
+
+    return DB::transaction(function () use ($request, $alquilere) {
+
+        /* === 1. RENOVACIÓN (cambio de fin_fecha) =============== */
+        if ($request->fin_fecha !== $alquilere->fin_fecha) {
+
+            // 1.a  Cerrar alquiler vigente
+            $alquilere->estado    = 0;              // terminado
             $alquilere->cajero_id = $request->cajero_id;
-            $alquilere->estado = 0;
             $alquilere->save();
-    
-            // Crear nuevo alquiler activo
-            $nuevoAlquilere = new Alquilere();
-            $nuevoAlquilere->nombre = $request->nombre;
-            $nuevoAlquilere->cliente_id = $request->cliente_id;
-            $nuevoAlquilere->apertura = $request->apertura;
-            $nuevoAlquilere->paquete_id = $request->paquete_id;
-            $nuevoAlquilere->habilitacion = $request->habilitacion;
-            $nuevoAlquilere->casilla_id = $request->casilla_id;
-            $nuevoAlquilere->categoria_id = $request->categoria_id;
-            $nuevoAlquilere->precio_id = $request->precio_id;
-            $nuevoAlquilere->ini_fecha = $request->ini_fecha;
-            $nuevoAlquilere->fin_fecha = $request->fin_fecha;
-            $nuevoAlquilere->estado_pago = $request->estado_pago;
-            $nuevoAlquilere->cajero_id = $request->cajero_id;
-            $nuevoAlquilere->estado = 1;
-            $nuevoAlquilere->save();
-    
-            // Actualizar estado de casilla
-            $casilla = Casilla::find($alquilere->casilla_id);
-            if ($casilla) {
+
+            // 1.b  Crear nuevo alquiler activo
+            $nuevo = new Alquilere();
+            $nuevo->fill($request->only([
+                'nombre','cliente_id','apertura','habilitacion','casilla_id',
+                'categoria_id','precio_id','ini_fecha','fin_fecha',
+                'estado_pago','cajero_id'
+            ]));
+            $nuevo->estado = 1;                     // activo
+            $nuevo->save();
+
+            // 1.c  Actualizar casilla (si se envía casilla_estado)
+            if ($casilla = Casilla::find($alquilere->casilla_id)) {
                 $casilla->estado = $request->casilla_estado ?? 0;
                 $casilla->save();
             }
-    
-            // Enviar correo con el nuevo alquiler
-            $cliente = Cliente::find($nuevoAlquilere->cliente_id);
-            if ($cliente) {
-                Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-            }
-    
-            return response()->json(['message' => 'Alquiler actualizado correctamente y nuevo alquiler creado', 'alquilere' => $nuevoAlquilere]);
+
+            return response()->json([
+                'message'   => 'Alquiler renovado correctamente',
+                'alquilere' => $nuevo
+            ]);
         }
-    
-        // Si solo se actualiza sin cambio de fechas o paquete
-        $alquilere->nombre = $request->nombre;
-        $alquilere->apertura = $request->apertura;
-        $alquilere->habilitacion = $request->habilitacion;
-        $alquilere->cliente_id = $request->cliente_id;
-        $alquilere->paquete_id = $request->paquete_id;
-        $alquilere->casilla_id = $request->casilla_id;
-        $alquilere->categoria_id = $request->categoria_id;
-        $alquilere->precio_id = $request->precio_id;
-        $alquilere->ini_fecha = $request->ini_fecha;
-        $alquilere->fin_fecha = $request->fin_fecha;
-        $alquilere->estado_pago = $request->estado_pago;
-        $alquilere->cajero_id = $request->cajero_id;
+
+        /* === 2. EDICIÓN SIN CAMBIO DE FECHA ==================== */
+        $alquilere->fill($request->only([
+            'nombre','apertura','habilitacion','cliente_id','casilla_id',
+            'categoria_id','precio_id','ini_fecha','fin_fecha',
+            'estado_pago','cajero_id','autorizado_recojo'
+        ]));
         $alquilere->save();
-    
-        // Actualizar estado de casilla
-        $casilla = Casilla::find($alquilere->casilla_id);
-        if ($casilla) {
-            $casilla->estado = $request->casilla_estado;
+
+        if ($casilla = Casilla::find($alquilere->casilla_id)) {
+            $casilla->estado = $request->casilla_estado ?? $casilla->estado;
             $casilla->save();
         }
-    
-        // Enviar correo en todos los casos
-        $cliente = Cliente::find($alquilere->cliente_id);
-        if ($cliente) {
-            Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-        }
-    
-        return response()->json(['message' => 'Alquiler actualizado correctamente', 'alquilere' => $alquilere]);
-    }
-    
-    
+
+        return response()->json([
+            'message'   => 'Alquiler actualizado correctamente',
+            'alquilere' => $alquilere
+        ]);
+    });
+}
 
 
 
-    
 
-    
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -225,13 +191,13 @@ class AlquilereController extends Controller
     public function destroy(Alquilere $alquilere)
     {
         $casilla = $alquilere->casilla; // Obtener la casilla asociada al alquiler
-                      if ($casilla) {
-                                $casilla->estado = 1; // Cambiar el estado de la casilla a 1
-                                $casilla->save();
-                                  }
-                                $alquilere->estado = 0;
-                                $alquilere->save();
-                                return $alquilere;
+        if ($casilla) {
+            $casilla->estado = 1; // Cambiar el estado de la casilla a 1
+            $casilla->save();
+        }
+        $alquilere->estado = 0;
+        $alquilere->save();
+        return $alquilere;
     }
 
     public function updateVencidos()
@@ -255,54 +221,15 @@ class AlquilereController extends Controller
     }
 
     public function updateCasillasSeleccionadas(Request $request)
-{
+    {
 
-    // Validar el request
-    $request->validate([
-        'ids' => 'required|array',
-        'ids.*' => 'integer|exists:alquileres,id', // Asegura que cada id exista en la tabla alquileres
-    ]);
+        // Validar el request
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:alquileres,id', // Asegura que cada id exista en la tabla alquileres
+        ]);
 
-    $alquileres = Alquilere::whereIn('id', $request->ids)->get();
-    $errors = [];
-
-    foreach ($alquileres as $alquilere) {
-        try {
-            // Actualizar el estado de la casilla asociada
-            $casilla = Casilla::find($alquilere->casilla_id);
-            if ($casilla) {
-                $casilla->estado = 2; // Cambiar estado a "Con Correspondencia"
-                $casilla->save();
-            }
-
-            $cliente = $alquilere->cliente;
-            if ($cliente) {
-                Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-            } else {
-                $errors[] = "Cliente no encontrado para alquiler ID: " . $alquilere->id;
-            }
-        } catch (\Exception $e) {
-            $errors[] = "Error actualizando alquiler ID: " . $alquilere->id . " - " . $e->getMessage();
-        }
-    }
-
-    if (count($errors) > 0) {
-        return response()->json(['status' => 'error', 'message' => $errors], 500);
-    }
-
-    return response()->json(['status' => 'success', 'message' => 'Casillas actualizadas y correos enviados con éxito']);
-}
-
-public function updateAllToOcupadas()
-{
-
-    try {
-        // Obtener todas las casillas en estado "Con Correspondencia" (estado 2)
-        $alquileres = Alquilere::whereHas('casilla', function($query) {
-            $query->where('estado', 2);
-        })->get();
-
-
+        $alquileres = Alquilere::whereIn('id', $request->ids)->get();
         $errors = [];
 
         foreach ($alquileres as $alquilere) {
@@ -310,8 +237,15 @@ public function updateAllToOcupadas()
                 // Actualizar el estado de la casilla asociada
                 $casilla = Casilla::find($alquilere->casilla_id);
                 if ($casilla) {
-                    $casilla->estado = 0; // Cambiar estado a "Ocupado"
+                    $casilla->estado = 2; // Cambiar estado a "Con Correspondencia"
                     $casilla->save();
+                }
+
+                $cliente = $alquilere->cliente;
+                if ($cliente) {
+                    Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
+                } else {
+                    $errors[] = "Cliente no encontrado para alquiler ID: " . $alquilere->id;
                 }
             } catch (\Exception $e) {
                 $errors[] = "Error actualizando alquiler ID: " . $alquilere->id . " - " . $e->getMessage();
@@ -322,20 +256,52 @@ public function updateAllToOcupadas()
             return response()->json(['status' => 'error', 'message' => $errors], 500);
         }
 
-
-        return response()->json(['status' => 'success', 'message' => 'Todas las casillas "Con Correspondencia" han sido actualizadas a "Ocupado" y correos enviados con éxito']);
-    } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => 'Error en el proceso de actualización a "Ocupadas"'], 500);
+        return response()->json(['status' => 'success', 'message' => 'Casillas actualizadas y correos enviados con éxito']);
     }
-}
-public function getCasillasByEstado($estado)
+
+    public function updateAllToOcupadas()
+    {
+
+        try {
+            // Obtener todas las casillas en estado "Con Correspondencia" (estado 2)
+            $alquileres = Alquilere::whereHas('casilla', function ($query) {
+                $query->where('estado', 2);
+            })->get();
+
+
+            $errors = [];
+
+            foreach ($alquileres as $alquilere) {
+                try {
+                    // Actualizar el estado de la casilla asociada
+                    $casilla = Casilla::find($alquilere->casilla_id);
+                    if ($casilla) {
+                        $casilla->estado = 0; // Cambiar estado a "Ocupado"
+                        $casilla->save();
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Error actualizando alquiler ID: " . $alquilere->id . " - " . $e->getMessage();
+                }
+            }
+
+            if (count($errors) > 0) {
+                return response()->json(['status' => 'error', 'message' => $errors], 500);
+            }
+
+
+            return response()->json(['status' => 'success', 'message' => 'Todas las casillas "Con Correspondencia" han sido actualizadas a "Ocupado" y correos enviados con éxito']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error en el proceso de actualización a "Ocupadas"'], 500);
+        }
+    }
+    public function getCasillasByEstado($estado)
     {
         $casillas = Casilla::where('estado', $estado)->get();
 
         $result = $casillas->map(function ($casilla) {
             $alquiler = Alquilere::with(['cliente', 'categoria', 'precio', 'cajero'])
-                                 ->where('casilla_id', $casilla->id)
-                                 ->first();
+                ->where('casilla_id', $casilla->id)
+                ->first();
 
             return [
                 'casilla' => $casilla,
@@ -375,70 +341,4 @@ public function getCasillasByEstado($estado)
     {
         return $this->getCasillasByEstado(5);
     }
-
-
-
-
-    public function buscarPorCasilla($nombre)
-    {
-        // Busca la casilla por su nombre
-        $casilla = Casilla::where('nombre', 'LIKE', '%' . $nombre . '%')->first();
-    
-        if ($casilla) {
-            // Busca el alquiler relacionado con la casilla
-            $alquiler = Alquilere::with(['paquete']) // Incluye el paquete asociado al alquiler
-                                 ->where('casilla_id', $casilla->id)
-                                 ->first();
-    
-            if ($alquiler && $alquiler->paquete) {
-                // Retorna solo el código del paquete asociado a ese alquiler
-                return response()->json([
-                    'success' => true,
-                    'estado_casilla' => $alquiler->casilla->estado,
-                    'paquete' => $alquiler->paquete->codigo, // Retorna solo un paquete
-                ]);
-            } else {
-                return response()->json(['success' => false, 'message' => 'No se encontró un alquiler asociado a esta casilla o no tiene un paquete asociado.']);
-            }
-        }
-    
-        return response()->json(['success' => false, 'message' => 'No se encontró la casilla con ese nombre.']);
-    }
-    
-    
-
-    public function eliminarPaqueteId($codigo)
-    {
-        try {
-    
-            // Buscar el paquete por su código
-            $paquete = Paquete::where('codigo', $codigo)->firstOrFail();
-    
-    
-            // Buscar el alquiler que tiene este paquete_id
-            $alquilere = Alquilere::where('paquete_id', $paquete->id)->firstOrFail();
-    
-    
-            // Establecer paquete_id a null en el alquiler
-            $alquilere->paquete_id = null;
-    
-            // Guardar los cambios
-            $alquilere->save();
-    
-    
-            return response()->json(['message' => 'paquete_id eliminado correctamente.'], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Error al eliminar paquete_id.',
-                'exception' => $e->getMessage()
-            ], 500);
-        }
-    }
-    
-
-    
-    
-
-
-    
 }
