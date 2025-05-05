@@ -1,4 +1,4 @@
 
-php artisan make:model Paquetes -rm --api
+php artisan make:model Eventos -rm --api
 
-php artisan migrate --path=/database/migrations/2023_11_10_065321_create_alquileres_table.php
+php artisan migrate --path=/database/migrations/2025_05_02_101628_create_eventos_table.php
