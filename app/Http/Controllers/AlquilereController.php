@@ -12,7 +12,6 @@ use App\Models\Cajero;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Confirmationagbcmail;
-use App\Models\Eventos;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -61,24 +60,9 @@ class AlquilereController extends Controller
             $casilla->estado = 0;
             $casilla->save();
         }
+
+
         $alquilere->save();
-
-        // Registrar el evento usando el modelo Evento
-        Eventos::create([
-            'accion' => 'Alquiler de casilla',
-            'cajero_id' => $alquilere->cajero_id,
-            'descripcion' => 'Casilla alquilada',
-            'casilla_id' => $alquilere->casilla_id,  // ✅ AHORA USA EL ID DE LA CASILLA CORRECTA
-            'fecha_hora' => now(),
-        ]);
-
-
-        // Cargar la relación de sucursale antes de devolver la respuesta
-        $alquilere->load('cajero');
-        $alquilere->load('casilla');
-
-
-
         //  $cliente = Cliente::find($request->cliente_id);
 
         //  if ($cliente) {
@@ -130,108 +114,67 @@ class AlquilereController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Alquilere $alquilere)
-    {
-        /*-----------------------------------------------------------
+{
+    /*-----------------------------------------------------------
       Asegurarse de que siempre llegue un cajero_id:
       1) si viene en la petición: lo dejamos
       2) si no viene, tomamos el del usuario autenticado
     -----------------------------------------------------------*/
-        $request->merge([
-            'cajero_id' => $request->cajero_id ?? (Auth::user()->cajero->id ?? null)
-        ]);
+    $request->merge([
+        'cajero_id' => $request->cajero_id ?? (Auth::user()->cajero->id ?? null)
+    ]);
 
-        return DB::transaction(function () use ($request, $alquilere) {
+    return DB::transaction(function () use ($request, $alquilere) {
 
-            /* === 1. RENOVACIÓN (cambio de fin_fecha) =============== */
-            if ($request->fin_fecha !== $alquilere->fin_fecha) {
+        /* === 1. RENOVACIÓN (cambio de fin_fecha) =============== */
+        if ($request->fin_fecha !== $alquilere->fin_fecha) {
 
-                // 1.a  Cerrar alquiler vigente
-                $alquilere->estado    = 0;              // terminado
-                $alquilere->cajero_id = $request->cajero_id;
-                $alquilere->save();
-
-                // 1.b  Crear nuevo alquiler activo
-                $nuevo = new Alquilere();
-                $nuevo->fill($request->only([
-                    'nombre',
-                    'cliente_id',
-                    'apertura',
-                    'habilitacion',
-                    'casilla_id',
-                    'categoria_id',
-                    'precio_id',
-                    'ini_fecha',
-                    'fin_fecha',
-                    'estado_pago',
-                    'cajero_id'
-                ]));
-                $nuevo->estado = 1;                     // activo
-                $nuevo->save();
-
-                // 1.c  Actualizar casilla (si se envía casilla_estado)
-                if ($casilla = Casilla::find($alquilere->casilla_id)) {
-                    $casilla->estado = $request->casilla_estado ?? 0;
-                    $casilla->save();
-                }
-  // Registrar el evento usando el modelo Evento
-  Eventos::create([
-    'accion' => 'Renovacion de casilla',
-    'cajero_id' => $alquilere->cajero_id,
-    'descripcion' => 'Renovacion de casilla',
-    'casilla_id' => $alquilere->casilla_id,  // ✅ AHORA USA EL ID DE LA CASILLA CORRECTA
-    'fecha_hora' => now(),
-]);
-
-
-// Cargar la relación de sucursale antes de devolver la respuesta
-$alquilere->load('cajero');
-$alquilere->load('casilla');
-                return response()->json([
-                    'message'   => 'Alquiler renovado correctamente',
-                    'alquilere' => $nuevo
-                ]);
-            }
-
-            /* === 2. EDICIÓN SIN CAMBIO DE FECHA ==================== */
-            $alquilere->fill($request->only([
-                'nombre',
-                'apertura',
-                'habilitacion',
-                'cliente_id',
-                'casilla_id',
-                'categoria_id',
-                'precio_id',
-                'ini_fecha',
-                'fin_fecha',
-                'estado_pago',
-                'cajero_id',
-                'autorizado_recojo'
-            ]));
+            // 1.a  Cerrar alquiler vigente
+            $alquilere->estado    = 0;              // terminado
+            $alquilere->cajero_id = $request->cajero_id;
             $alquilere->save();
 
+            // 1.b  Crear nuevo alquiler activo
+            $nuevo = new Alquilere();
+            $nuevo->fill($request->only([
+                'nombre','cliente_id','apertura','habilitacion','casilla_id',
+                'categoria_id','precio_id','ini_fecha','fin_fecha',
+                'estado_pago','cajero_id'
+            ]));
+            $nuevo->estado = 1;                     // activo
+            $nuevo->save();
+
+            // 1.c  Actualizar casilla (si se envía casilla_estado)
             if ($casilla = Casilla::find($alquilere->casilla_id)) {
-                $casilla->estado = $request->casilla_estado ?? $casilla->estado;
+                $casilla->estado = $request->casilla_estado ?? 0;
                 $casilla->save();
             }
-  // Registrar el evento usando el modelo Evento
-  Eventos::create([
-    'accion' => 'Edicion',
-    'cajero_id' => $alquilere->cajero_id,
-    'descripcion' => 'Edicion de casilla',
-    'casilla_id' => $alquilere->casilla_id,  // ✅ AHORA USA EL ID DE LA CASILLA CORRECTA
-    'fecha_hora' => now(),
-]);
 
-
-// Cargar la relación de sucursale antes de devolver la respuesta
-$alquilere->load('cajero');
-$alquilere->load('casilla');
             return response()->json([
-                'message'   => 'Alquiler actualizado correctamente',
-                'alquilere' => $alquilere
+                'message'   => 'Alquiler renovado correctamente',
+                'alquilere' => $nuevo
             ]);
-        });
-    }
+        }
+
+        /* === 2. EDICIÓN SIN CAMBIO DE FECHA ==================== */
+        $alquilere->fill($request->only([
+            'nombre','apertura','habilitacion','cliente_id','casilla_id',
+            'categoria_id','precio_id','ini_fecha','fin_fecha',
+            'estado_pago','cajero_id','autorizado_recojo'
+        ]));
+        $alquilere->save();
+
+        if ($casilla = Casilla::find($alquilere->casilla_id)) {
+            $casilla->estado = $request->casilla_estado ?? $casilla->estado;
+            $casilla->save();
+        }
+
+        return response()->json([
+            'message'   => 'Alquiler actualizado correctamente',
+            'alquilere' => $alquilere
+        ]);
+    });
+}
 
 
 
