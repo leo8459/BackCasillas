@@ -38,6 +38,8 @@ Route::group(['prefix'=>'api'],function(){
     Route::apiResource('/alquileres','AlquilereController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/precios','PrecioController');  //editar agragar eliminar listar apiresource
     Route::apiResource('/cajeros','CajeroController');  //editar agragar eliminar listar apiresource
+    Route::apiResource('/eventos','EventosController');  //editar agragar eliminar listar apiresource
+
 });
 
 
