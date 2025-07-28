@@ -8,21 +8,35 @@ use Illuminate\Database\Eloquent\Model;
 class Casilla extends Model
 {
     use HasFactory;
-    public function Categoria(){
+
+    protected $fillable = [
+        'nombre',
+        'observacion',
+        'categoria_id',
+        'seccione_id',
+        'estado',
+        'departamento',
+        'llaves_id',
+    ];
+
+    public function Categoria()
+    {
         return $this->belongsTo(Categoria::class);
     }
-    public function Seccione(){
+    public function Seccione()
+    {
         return $this->belongsTo(Seccione::class);
     }
-    public function llaves(){
+    public function llaves()
+    {
         return $this->belongsTo(Llave::class, 'llaves_id');
     }
-    public function Cliente(){
+    public function Cliente()
+    {
         return $this->belongsTo(Cliente::class);
     }
     public function alquilere()
     {
         return $this->hasOne(Alquilere::class);
     }
-    
 }

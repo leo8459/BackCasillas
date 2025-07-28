@@ -165,28 +165,40 @@ class CasillaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Casilla $casilla)
-    {
-         $casilla->nombre = $request->nombre;
-         $casilla->observacion = $request->observacion;
-         $casilla->categoria_id = $request->categoria_id;
-         $casilla->seccione_id = $request->seccione_id;
-         $casilla->estado= $request->estado;
-         $casilla->departamento  = $request->departamento ;
-         $casilla->llaves_id = $request->llaves_id;
+{
+    $request->validate([
+        'nombre'        => 'required|string|max:255',
+        'categoria_id'  => 'required|integer',
+        'seccione_id'   => 'required|integer',
+        'estado'        => 'required|integer',
+        'departamento'  => 'nullable|string|max:255',
+        'observacion'   => 'nullable|string',
+        'llave_nombre'  => 'nullable|string|max:100',
+        'cliente_id'    => 'nullable|integer',
+    ]);
 
-
-         $casilla->save();
-         $cliente = Cliente::find($request->cliente_id);
-
-         if ($cliente && $cliente->email) {
-             // Envía un correo electrónico al cliente
-             Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
-         } else {
-             // Manejar caso en el que no se encuentra el cliente o no tiene correo electrónico
-             // Aquí puedes agregar código para manejar este caso según tus necesidades
-         }
-         return $casilla;
+    if ($request->filled('llave_nombre')) {
+        $llave = Llave::firstOrCreate(['nombre' => $request->llave_nombre]);
+        $casilla->llaves_id = $llave->id;
+    } else {
+        $casilla->llaves_id = null;
     }
+
+    $casilla->fill($request->only([
+        'nombre','observacion','categoria_id','seccione_id','estado','departamento'
+    ]));
+
+    $casilla->save();
+
+    // correo opcional
+    $cliente = Cliente::find($request->cliente_id);
+    if ($cliente && $cliente->email) {
+        Mail::to($cliente->email)->send(new Confirmationagbcmail($cliente));
+    }
+
+    return $casilla;
+}
+
 
     /**
      * Remove the specified resource from storage.
